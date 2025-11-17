@@ -1,0 +1,2 @@
+<?php
+$MESS["OTUS_DEALERSERVICE_TAB_TITLE"] = "Гараж";

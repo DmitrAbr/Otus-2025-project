@@ -1,0 +1,12 @@
+{
+    "name": "dmitr/composer",
+    "require": {
+        "symfony/var-dumper": "^7.3"
+    },
+    "authors": [
+        {
+            "name": "дмитрий",
+            "email": "dmitrij.abramov.2003_7@mail.ru"
+        }
+    ]
+}
