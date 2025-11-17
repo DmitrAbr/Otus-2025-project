@@ -7,22 +7,30 @@ use Bitrix\Main\Config\Option;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\SystemException;
 use Bitrix\Iblock\IblockTable;
-use Bitrix\Iblock\SectionTable;
-use Bitrix\Iblock\ElementTable;
 use CIBlockElement;
 use CIBlockSection;
 use RuntimeException;
 use Otus\Dealerservice\Constants;
 use Otus\Dealerservice\Helpers\HighloadHelper;
 use Otus\Dealerservice\Helpers\UserFieldsHelper;
+use Bitrix\Catalog\Model\Product;
+use CGroup;
 
 Loc::loadMessages(__FILE__);
 
 class Installer
 {
     private int $iblockId;
-    private ?int $ufMakeFieldId = null;
     
+    /**
+     * Installer constructor.
+     *
+     * Checks if the 'iblock' module is installed.
+     * If not, throws a SystemException.
+     * Finds the default product catalog ID.
+     *
+     * @throws SystemException
+     */
     public function __construct()
     {
         if (!Loader::includeModule("iblock")) {
@@ -32,6 +40,17 @@ class Installer
         $this->iblockId = $this->findIblockCatalog();
     }
     
+    /**
+     * Finds the default product catalog ID from the 'crm' module.
+     *
+     * If the ID is not found in the options, it searches for the
+     * catalog with the XML ID 'FUTURE-1C-CATALOG' and type 'CRM_PRODUCT_CATALOG'.
+     * If the catalog is not found, it throws a RuntimeException.
+     *
+     * @return int The default product catalog ID.
+     *
+     * @throws RuntimeException If the product catalog is not found.
+     */
     private function findIblockCatalog(): int
     {
         $iblockId = Option::get("crm", "default_product_catalog_id");
@@ -44,6 +63,7 @@ class Installer
                 ],
                 'select' => ['ID']
             ])->fetch();
+
             
             $iblockId = $result['ID'] ?? 0;
         }
@@ -55,14 +75,54 @@ class Installer
         return (int)$iblockId;
     }
     
+    /**
+     * Installs demo data for the dealerservice module.
+     *
+     * Creates a section, a hlblock, a user group and user fields.
+     * Sets the demo data in the options table.
+     */
     public function installDemoData(): void
     {
         $sectionId = $this->createSection();
         list($hlblockId, $ufMakeId) = $this->createHLBlockAuto();
+        $idUserGroup = $this->createUserGroups();
         $this->createUserFields($hlblockId, $ufMakeId);
         //$this->createDemoParts($sectionId);
+
+        
+        Option::set(Constants::MODULE_ID, 'iblock_catalog_section_id', (int)$sectionId);
+        Option::set(Constants::MODULE_ID, 'auto_hlblock_id', (int)$hlblockId);
+        Option::set(Constants::MODULE_ID, 'user_group_id', (int)$idUserGroup);
+        Option::set(Constants::MODULE_ID, 'iblock_catalog_id', (string)$this->iblockId);
     }
     
+    
+    /**
+     * Creates a user group for the dealerservice module demo data.
+     *
+     * The user group is named 'Garage Users' and has the string ID 'garage_users'.
+     * The group is active and has a sort order of 100.
+     *
+     * @return int The ID of the created user group.
+     */
+    public function createUserGroups(): int
+    {
+        $group = new CGroup;
+        $arFields = Array(
+            "ACTIVE"       => "Y",
+            "C_SORT"       => 100,
+            "NAME"         => Loc::getMessage("NAME_GROUP_GARAGE"),
+            "DESCRIPTION"  => Loc::getMessage("NAME_GROUP_GARAGE"),
+            "STRING_ID"      => "garage_users"
+        );
+
+        $NEW_GROUP_ID = $group->Add($arFields);
+
+        if (strlen($group->LAST_ERROR)>0) ShowError($group->LAST_ERROR);
+        
+        return $NEW_GROUP_ID;
+    }
+
     public function uninstallDemoData()
     {
     	$this->deleteUserFields();
@@ -111,7 +171,7 @@ class Installer
                 "Ошибка создания раздела: " . ($bs->LAST_ERROR ?: 'Неизвестная ошибка')
             );
         }
-        
+
         return (int)$sectionId;
     }
     
@@ -131,8 +191,6 @@ class Installer
         if ($hlblockId <= 0) {
             throw new RuntimeException("Failed to create HLBlock");
         }
-        
-        Option::set(Constants::MODULE_ID, 'auto_hlblock_id', $hlblockId);
         
         $properties = [
             'UF_MAKE' => [

@@ -14,3 +14,4 @@ $MESS["HLBLOCK_AUTO_MAKE"] = "Марка";
 $MESS["HLBLOCK_AUTO_MODEL"] = "Модель";
 $MESS["HLBLOCK_AUTO_YAER"] = "Год";
 $MESS["PRODUCT_SUPPORTED_AUTO"] = "Поддерживаемые автомобили";
+$MESS["NAME_GROUP_GARAGE"] = "Otus: Пользователи имеющие доступ к гаражу клиента";
