@@ -9,3 +9,7 @@
     color: #3498db;
     text-decoration: underline;
 }
+
+.ui-toolbar-left {
+    margin-right: 10px;
+}

@@ -61,10 +61,22 @@ class otus_dealerservice extends CModule
     function installFiles()
     {
         $component_path = $this->getPath(). '/install/components';
-		
+        $to_component_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/components';
+		$js_path = $this->getPath(). '/install/js';
+        $to_js_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/js';
+
+        if(Directory::isDirectoryExists($js_path))
+        {
+            CopyDirFiles($js_path, $to_js_path, true, true);
+        }
+        else
+        {
+            throw new InvalidPathException($js_path);
+        }
+
 		if(Directory::isDirectoryExists($component_path))
 		{
-			CopyDirFiles($component_path, $_SERVER["DOCUMENT_ROOT"].'/bitrix/components', true, true);
+			CopyDirFiles($component_path, $to_component_path, true, true);
 		}
 		else
 		{
@@ -150,7 +162,28 @@ class otus_dealerservice extends CModule
     function uninstallFiles()
     {
         $component_path = $this->getPath(). '/install/components';
-		
+		$js_path = $this->getPath(). '/install/js';
+
+        if(Directory::isDirectoryExists($js_path))
+		{
+			$installed_components = new \DirectoryIterator($js_path);
+			foreach($installed_components as $component)
+			{
+				if($component->isDir() && !$component->isDot())
+				{
+					$target_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/js/'.$component->getFilename();
+					if(Directory::isDirectoryExists($target_path))
+					{
+						Directory::deleteDirectory($target_path);
+					}
+				}
+			}
+		}
+		else
+		{
+			throw new InvalidPathException($component_path);
+		}
+
 		if(Directory::isDirectoryExists($component_path))
 		{
 			$installed_components = new \DirectoryIterator($component_path);

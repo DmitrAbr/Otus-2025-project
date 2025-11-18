@@ -32,7 +32,7 @@ class ContactTabs
 					'componentData' => [
 						'template' => '',
 						'params' => [
-							'contactID' => $event->getParameter('entityID')
+							'contactID' => $event->getParameter('entityID')			
 						]
 					]
 				],

@@ -43,7 +43,7 @@ class AutoListViewComponent extends \CBitrixComponent
         $errors = new ErrorCollection();
         global $USER;
 
-        if(!Loader::includeModule(self::MODULE_ID) || !Loader::includeModule('crm'))
+        if(!Loader::includeModule(self::MODULE_ID) || !Loader::includeModule('crm') || !Loader::includeModule('ui'))
         {
             $errors->setError(new Error("Не установлены обязательные модули"));
         }

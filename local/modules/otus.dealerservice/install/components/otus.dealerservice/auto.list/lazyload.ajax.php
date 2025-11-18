@@ -57,6 +57,7 @@ $APPLICATION->IncludeComponent(
     [
         'PLAIN_VIEW' => false,
         'USE_PADDING' => true,
+        'USE_UI_TOOLBAR' => 'Y',
         'POPUP_COMPONENT_NAME' => 'otus.dealerservice:auto.list',
         'POPUP_COMPONENT_TEMPLATE_NAME' => $componentData['template'] ?? '',
         'POPUP_COMPONENT_PARAMS' => $componentParams
