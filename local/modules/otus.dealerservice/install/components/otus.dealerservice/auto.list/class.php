@@ -11,6 +11,8 @@ use Bitrix\Main\Localization\Loc;
 use Otus\Dealerservice\Helpers\Actions;
 use Bitrix\Main\ErrorCollection;
 use Bitrix\Main\Error;
+use Bitrix\Main\Engine\Contract\Controllerable;
+use Bitrix\Main\Diag\Debug;
 
 if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
     die();
@@ -18,7 +20,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
 
 Loc::loadMessages(__FILE__);
 
-class AutoListViewComponent extends \CBitrixComponent
+class AutoListViewComponent extends \CBitrixComponent implements Controllerable
 {
     const MODULE_ID = "otus.dealerservice";
     
@@ -73,6 +75,56 @@ class AutoListViewComponent extends \CBitrixComponent
         }
     }
     
+    public function configureActions(): array
+    {
+        return [
+            'addAuto' => [
+                'prefilters' => [],
+                'postfilters' => [],
+            ],
+        ];
+    }
+
+    public function addAutoAction(array $params)
+    {
+        Loader::includeModule(self::MODULE_ID);
+
+
+        $response = [
+            'success' => false,
+            'errors' => []
+        ];
+
+        try {
+            $data = [
+                'CLIENT_ID' => (int)$params['CLIENT_ID'],
+                'CREATED_BY_ID' => (int)$params['CREATED_BY_ID'],
+                'UPDATED_BY_ID' => (int)$params['UPDATED_BY_ID'],
+                'STATUS' => $params['STATUS'] ?? AutoTable::NEW,
+                'MAKE' => $params['MAKE'] ?? '',
+                'MODEL' => $params['MODEL'] ?? '',
+                'NUMBER' => $params['NUMBER'] ?? '',
+                'YEAR' => isset($params['YEAR']) ? (int)$params['YEAR'] : null,
+                'COLOR' => $params['COLOR'] ?? '',
+                'MILEAGE' => isset($params['MILEAGE']) ? (int)$params['MILEAGE'] : null,
+            ];
+
+            $result = AutoTable::add($data);
+
+            if ($result->isSuccess()) {
+                $response['success'] = true;
+                $response['id'] = $result->getId();
+            } else {
+                $response['errors'] = $result->getErrorMessages();
+            }
+
+        } catch (\Exception $e) {
+            $response['errors'][] = $e->getMessage();
+        }
+
+        return $response;
+    }
+
     private function fillGridInfo(): void
     {
         $this->arResult['gridId'] = static::GRID_ID;
@@ -141,12 +193,6 @@ class AutoListViewComponent extends \CBitrixComponent
                 'name' => 'Статус',
                 'sort' => 'STATUS',
                 'default' => true
-            ],
-            [
-                'id' => 'CLIENT_NAME',
-                'name' => 'Клиент',
-                'sort' => 'CONTACT.NAME',
-                'default' => false
             ],
             [
                 'id' => 'CREATED_AT',
@@ -226,10 +272,13 @@ class AutoListViewComponent extends \CBitrixComponent
             'filter' => $preparedFilter,
             'select' => [
                 'ID', 'MAKE', 'MODEL', 'NUMBER', 'YEAR', 'COLOR', 'MILEAGE', 'STATUS',
-                'CREATED_AT', 'UPDATED_AT',
+                'CREATED_AT', 'UPDATED_AT', 'CLIENT_ID',
                 'CREATOR_ID' => 'CREATED_BY.ID',
                 'UPDATER_ID' => 'UPDATED_BY.ID',
                 'CREATOR_LOGIN' => 'CREATED_BY.LOGIN',
+                'CLIENT_NAME' => 'CONTACT.NAME',
+                'CLIENT_LAST_NAME' => 'CONTACT.LAST_NAME',
+                'CLIENT_SECOND_NAME' => 'CONTACT.SECOND_NAME',
                 'CREATOR_NAME' => 'CREATED_BY.NAME',
                 'CREATOR_LAST_NAME' => 'CREATED_BY.LAST_NAME',
                 'CREATOR_SECOND_NAME' => 'CREATED_BY.SECOND_NAME',
@@ -244,9 +293,22 @@ class AutoListViewComponent extends \CBitrixComponent
             'count_total' => true
         ]);
         
+        $this->arResult['CLIENT_NAME'] = '';
+
         while ($item = $dataAuto->fetch()) {
             $preparedItem = $this->prepareItemData($item);
             
+            if(empty($this->arResult['CLIENT_NAME']))
+            {
+                $this->arResult['CLIENT_NAME'] = \CUser::FormatName(
+                    \CSite::GetNameFormat(),
+                    ['NAME' => $item['CLIENT_NAME'],
+                            'LAST_NAME' => $item['CLIENT_LAST_NAME'],
+                            'SECOND_NAME' => $item['CLIENT_SECOND_NAME']
+                        ],
+                );
+            }
+
             $list[] = [
                 'data' => $preparedItem,
                 'actions' => [
@@ -266,7 +328,7 @@ class AutoListViewComponent extends \CBitrixComponent
                 ]
             ];
         }
-        
+
         $pageNav->setRecordCount($dataAuto->getCount());
         $this->arResult['LIST'] = $list;
     }
@@ -297,15 +359,15 @@ class AutoListViewComponent extends \CBitrixComponent
         
         
         $item['CREATOR_NAME'] = \CUser::FormatName(
-        \CSite::GetNameFormat(), ['NAME' => $item['CREATOR_NAME'], 'LAST_NAME' => $item['CREATOR_LAST_NAME'], 'SECOND_NAME' => $item['CREATOR_SECOND_NAME']]
+            \CSite::GetNameFormat(), ['NAME' => $item['CREATOR_NAME'], 'LAST_NAME' => $item['CREATOR_LAST_NAME'], 'SECOND_NAME' => $item['CREATOR_SECOND_NAME']]
         );
         $item['CREATOR_NAME'] = '<a href="/company/personal/user/' . $item['CREATOR_ID'] . '/">' . $item['CREATOR_NAME'] . '</a>';
 
         $item['UPDATER_NAME'] = \CUser::FormatName(
-  \CSite::GetNameFormat(), ['NAME' => $item['UPDATER_NAME'], 'LAST_NAME' => $item['UPDATER_LAST_NAME'], 'SECOND_NAME' => $item['UPDATER_SECOND_NAME']]
+            \CSite::GetNameFormat(), ['NAME' => $item['UPDATER_NAME'], 'LAST_NAME' => $item['UPDATER_LAST_NAME'], 'SECOND_NAME' => $item['UPDATER_SECOND_NAME']]
         );
         $item['UPDATER_NAME'] = '<a href="/company/personal/user/' . $item['UPDATER_ID'] . '/">' . $item['UPDATER_NAME'] . '</a>';
-        
+
         $statusMap = [
             AutoTable::NEW => ['name' => Loc::getMessage('STATUS_NEW'), 'color' => '#2e86ab'],
             AutoTable::REJECTED => ['name' => Loc::getMessage('STATUS_REJECTED'), 'color' => '#e74c3c'],

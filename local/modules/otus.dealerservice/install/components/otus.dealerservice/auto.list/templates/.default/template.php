@@ -94,7 +94,9 @@ $APPLICATION->IncludeComponent(
     $component
 );
 ?>
-
+<?
+    $clientFields = ['name' => $arResult["CLIENT_NAME"], 'id' => $arParams["contactID"]];
+?>
 <script>
     BX.ready(function(){
         const buttonAdd = BX('add-button');
@@ -102,7 +104,27 @@ $APPLICATION->IncludeComponent(
         var popup = BX.PopupWindowManager.create();
 
         buttonAdd.addEventListener('click', function(){
-            (new BX.AddAutoWindow()).init();
+            (new BX.AddAutoWindow(
+                <?=json_encode($clientFields)?>,
+                <?=json_encode(defined('AIR_SITE_TEMPLATE') ? '--air' : '')?>
+            )).init();
         });
     });
 </script>
+<?php if (!empty($arParams['AJAX_LOADER'])) { ?>
+    <script>
+        BX.addCustomEvent('Grid::beforeRequest', function (gridData, argse) {
+            if (argse.gridId != '<?=$arResult['gridId'];?>') {
+                return;
+            }
+
+			if(argse.url === '')
+			{
+				argse.url = "<?=$component->getPath()?>/lazyload.ajax.php?site<?=\SITE_ID?>&internal=true&grid_id=<?=$arResult['gridId']?>&grid_action=filter&"
+			}
+
+            argse.method = 'POST'
+            argse.data = <?= \Bitrix\Main\Web\Json::encode($arParams['AJAX_LOADER']['data']) ?>
+        });
+    </script>
+<?php } ?>
