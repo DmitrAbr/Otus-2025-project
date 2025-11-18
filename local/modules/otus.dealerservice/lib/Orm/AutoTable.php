@@ -17,6 +17,12 @@ Loc::loadMessages(__FILE__);
 
 class AutoTable extends DataManager
 {
+    public const NEW = 'NEW';
+    public const ACTIVE = 'ACTIVE';
+    public const REJECTED = 'REJECTED';
+    public const IN_WORK = 'IN_WORK';
+    public const DONE = 'DONE';
+    
     public static function getTableName()
     {
         return 'otus_dealerservice_auto';
@@ -32,10 +38,6 @@ class AutoTable extends DataManager
             (new IntegerField('CLIENT_ID'))
             	->configureTitle(Loc::getMessage("NAME_FIELD_CLIENT"))
                 ->configureRequired(true),
-
-            (new IntegerField('RESPONSIBLE_ID'))
-            	->configureTitle(Loc::getMessage("NAME_FIELD_RESPONSIBLE"))
-                ->configureRequired(true),
                 
             (new IntegerField('CREATED_BY'))
             	->configureTitle(Loc::getMessage("NAME_FIELD_CREATED"))
@@ -48,7 +50,7 @@ class AutoTable extends DataManager
             (new StringField('STATUS'))
             	->configureTitle(Loc::getMessage("NAME_FIELD_STATUS"))
                 ->configureSize(50)
-                ->configureDefaultValue('NEW'),
+                ->configureDefaultValue('NEW'), //NEW, ACTIVE, REJECTED, IN_WORK, DONE
                 
             (new StringField('MAKE'))
             	->configureTitle(Loc::getMessage("NAME_FIELD_MAKE")),
@@ -83,12 +85,6 @@ class AutoTable extends DataManager
                 'CONTACT',
                 ContactTable::class,
                 Join::on('this.CLIENT_ID', 'ref.ID')
-            ),
-
-            new Reference(
-                'RESPONSIBLE',
-                UserTable::class,
-                Join::on('this.RESPONSIBLE_ID_ID', 'ref.ID')
             ),
 
             new Reference(
