@@ -127,10 +127,33 @@ class Installer
     public function uninstallDemoData()
     {
         $hlblockId = Option::get(Constants::MODULE_ID, 'auto_hlblock_id');
+        $userGroupId = Option::get(Constants::MODULE_ID, 'user_group_id');
+        $sectionId = Option::get(Constants::MODULE_ID, 'iblock_catalog_section_id');
     	$this->deleteUserFields();
     	$this->deleteHLBlocks((int)$hlblockId);
+        $this->deleteUserGroups($userGroupId);
+        $this->deleteSection($sectionId);
     }
     
+    private function deleteSection(int $sectionId)
+    {
+        $bs = new CIBlockSection;
+
+        if($sectionId)
+        {
+            $bs->Delete($sectionId);
+        }
+    }
+
+    private function deleteUserGroups(int $userGroupId)
+    {
+        $group = new CGroup();
+
+        if ($userGroupId) {
+            $group->Delete($userGroupId);
+        }
+    }
+
     /**
      * Deletes user fields created by the dealerservice module demo data.
      *

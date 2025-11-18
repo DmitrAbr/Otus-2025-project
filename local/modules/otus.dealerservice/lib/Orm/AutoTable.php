@@ -18,7 +18,6 @@ Loc::loadMessages(__FILE__);
 class AutoTable extends DataManager
 {
     public const NEW = 'NEW';
-    public const ACTIVE = 'ACTIVE';
     public const REJECTED = 'REJECTED';
     public const IN_WORK = 'IN_WORK';
     public const DONE = 'DONE';
@@ -50,7 +49,7 @@ class AutoTable extends DataManager
             (new StringField('STATUS'))
             	->configureTitle(Loc::getMessage("NAME_FIELD_STATUS"))
                 ->configureSize(50)
-                ->configureDefaultValue('NEW'), //NEW, ACTIVE, REJECTED, IN_WORK, DONE
+                ->configureDefaultValue('NEW'), //NEW, REJECTED, IN_WORK, DONE
                 
             (new StringField('MAKE'))
             	->configureTitle(Loc::getMessage("NAME_FIELD_MAKE")),
@@ -105,5 +104,65 @@ class AutoTable extends DataManager
     {
         $connection = \Bitrix\Main\Application::getConnection();
         $connection->dropTable(self::getTableName());
+    }
+
+    public static function demoDataUpload()
+    {
+        $autos = [
+            [
+                'CLIENT_ID' => 1,
+                'CREATED_BY_ID' => 1,
+                'UPDATED_BY_ID' => 1,
+                'STATUS' => self::NEW,
+                'MAKE' => 'BMW',
+                'MODEL' => 'X5',
+                'MILEAGE' => 10000,
+                'NUMBER' => 'A123BC',
+                'YEAR' => 2019,
+                'COLOR' => 'Желтый',
+            ],
+            [
+                'CLIENT_ID' => 5,
+                'CREATED_BY_ID' => 3,
+                'UPDATED_BY_ID' => 7,
+                'STATUS' => self::REJECTED,
+                'MAKE' => 'Toyota',
+                'MODEL' => 'Camry',
+                'NUMBER' => 'E456KX',
+                'YEAR' => 2024,
+                'COLOR' => 'Черный',
+            ],
+            [
+                'CLIENT_ID' => 5,
+                'CREATED_BY_ID' => 5,
+                'UPDATED_BY_ID' => 7,
+                'STATUS' => self::IN_WORK,
+                'MAKE' => 'Ford',
+                'MODEL' => 'Focus',
+                'NUMBER' => 'K123OM',
+                'YEAR' => 1999,
+                'COLOR' => 'Синий',
+            ],
+            [
+                'CLIENT_ID' => 3,
+                'CREATED_BY_ID' => 5,
+                'UPDATED_BY_ID' => 7,
+                'STATUS' => self::DONE,
+                'MAKE' => 'Chervolet',
+                'MODEL' => 'Camaro',
+                'NUMBER' => 'T521TT',
+                'YEAR' => 2019,
+                'COLOR' => 'Красный',
+            ],
+        ];
+
+        foreach($autos as $auto)
+        {
+            $result = self::add($auto);
+            if(!$result->isSuccess())
+            {   
+                throw new \RuntimeException(print_r($result->getErrorMessages(), true));
+            }
+        }
     }
 }

@@ -83,6 +83,10 @@ class otus_dealerservice extends CModule
     		if(!Application::getConnection($entity::getConnectionName())->isTableExists($entity::getTableName()))
     		{
     			Base::getInstance($entity)->createDbTable();
+                if(method_exists($entity, 'demoDataUpload'))
+                {
+                    $entity::demoDataUpload();
+                }
     		}
     	}
     }

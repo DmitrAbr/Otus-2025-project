@@ -8,8 +8,9 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\Type\DateTime;
 use Otus\Dealerservice\Orm\AutoTable;
 use Bitrix\Main\Localization\Loc;
-use Bitrix\Main\UserTable;
-use Bitrix\Crm\ContactTable;
+use Otus\Dealerservice\Helpers\Actions;
+use Bitrix\Main\ErrorCollection;
+use Bitrix\Main\Error;
 
 if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
     die();
@@ -39,19 +40,33 @@ class AutoListViewComponent extends \CBitrixComponent
     
     public function executeComponent()
     {
+        $errors = new ErrorCollection();
         global $USER;
-        if(!$USER->IsAdmin())
-        {
-            return;
-        }
-        try {
-            Loader::includeModule(self::MODULE_ID);
-            Loader::includeModule('crm');
 
+        if(!Loader::includeModule(self::MODULE_ID) || !Loader::includeModule('crm'))
+        {
+            $errors->setError(new Error("Не установлены обязательные модули"));
+        }
+
+        if(!$USER->IsAdmin() && Actions::checkRightsUser($USER->GetID()) === false)
+        {
+            $errors->setError(new Error('Доступ запрещен, обратитесь к менеджеру'));
+        }
+        
+        try {
             $this->getOptions();
             $this->fillGridInfo();
             $this->fillGridData();
             
+            if(!empty($errors))
+            {
+                foreach($errors as $error)
+                {
+                    ShowError($error->getMessage());
+                    return;
+                }
+            }
+
             $this->includeComponentTemplate();
         } catch (\Exception $e) {
             ShowError($e->getMessage());    
@@ -345,7 +360,6 @@ class AutoListViewComponent extends \CBitrixComponent
                 'default' => true,
                 'items' => [
                     AutoTable::NEW => 'Новый',
-                    AutoTable::ACTIVE => 'Активный',
                     AutoTable::REJECTED => 'Отклонен',
                     AutoTable::IN_WORK => 'В работе',
                     AutoTable::DONE => 'Завершен'
