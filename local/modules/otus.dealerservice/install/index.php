@@ -7,6 +7,7 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\Entity\Base;
 use Bitrix\Main\Application;
 use Bitrix\Main\Diag\Debug;
+use Bitrix\Main\Config\Option;
 use Otus\Dealerservice\Orm\AutoTable;
 use Otus\Dealerservice\Demo\Installer;
 use Otus\Dealerservice\Userfields\CarSelectorType;
@@ -115,9 +116,15 @@ class otus_dealerservice extends CModule
     	$this->uninstallDB();
     	$this->uninstallEvents();
     	$this->uninstallDemoData();
+        $this->uninstallOptions();
     	ModuleManager::UnRegisterModule($this->MODULE_ID);
     }
     
+    function uninstallOptions()
+    {
+    	Option::delete($this->MODULE_ID);
+    }
+
     function uninstallDemoData()
     {
     	Loader::IncludeModule($this->MODULE_ID);

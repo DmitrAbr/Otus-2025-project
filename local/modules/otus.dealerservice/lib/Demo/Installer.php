@@ -14,6 +14,7 @@ use Otus\Dealerservice\Constants;
 use Otus\Dealerservice\Helpers\HighloadHelper;
 use Otus\Dealerservice\Helpers\UserFieldsHelper;
 use Bitrix\Catalog\Model\Product;
+use Bitrix\Catalog\Model\Price;
 use CGroup;
 
 Loc::loadMessages(__FILE__);
@@ -87,7 +88,7 @@ class Installer
         list($hlblockId, $ufMakeId) = $this->createHLBlockAuto();
         $idUserGroup = $this->createUserGroups();
         $this->createUserFields($hlblockId, $ufMakeId);
-        //$this->createDemoParts($sectionId);
+        $this->createDemoParts($sectionId);
 
         
         Option::set(Constants::MODULE_ID, 'iblock_catalog_section_id', (int)$sectionId);
@@ -125,10 +126,16 @@ class Installer
 
     public function uninstallDemoData()
     {
+        $hlblockId = Option::get(Constants::MODULE_ID, 'auto_hlblock_id');
     	$this->deleteUserFields();
-    	$this->deleteHLBlocks();
+    	$this->deleteHLBlocks((int)$hlblockId);
     }
     
+    /**
+     * Deletes user fields created by the dealerservice module demo data.
+     *
+     * Deletes the fields 'UF_MAKE', 'UF_MODEL', 'UF_YEAR', 'UF_SUPPORTED_AUTO'.
+     */
     private function deleteUserFields()
     {
     	$fields = [
@@ -140,17 +147,31 @@ class Installer
     	
     	UserFieldsHelper::deleteProperty($fields);
     }
-    
-    private function deleteHLBlocks()
+
+    /**
+     * Deletes the Highload-block created by the dealerservice module demo data.
+     *
+     * If the Highload-block with the ID stored in the option 'auto_hlblock_id'
+     * exists, it is deleted. The table name is the value of the constant
+     * DEALERSERVICE_AUTO_HLBLOCK_TABLE_NAME.
+     */
+    private function deleteHLBlocks(int $hlblockId)
     {
-    	$hlblockId = Option::get(Constants::MODULE_ID, 'auto_hlblock_id');
-    	
     	if(!empty($hlblockId))
     	{
     		HighloadHelper::deleteHighloadBlock($hlblockId, Constants::DEALERSERVICE_AUTO_HLBLOCK_TABLE_NAME);
     	}
     }
     
+    
+    /**
+     * Creates a section for the dealerservice module demo data.
+     *
+     *
+     * @return int The ID of the created section.
+     *
+     * @throws RuntimeException If the section is not created.
+     */
     private function createSection(): int
     {
         $bs = new CIBlockSection;
@@ -175,6 +196,24 @@ class Installer
         return (int)$sectionId;
     }
     
+    /**
+     * Creates a Highload-block for the dealerservice module demo data.
+     *
+     * The name of the Highload-block is the value of the constant
+     * DEALERSERVICE_AUTO_HLBLOCK_NAME. The table name of the Highload-block
+     * is the value of the constant DEALERSERVICE_AUTO_HLBLOCK_TABLE_NAME.
+     *
+     * The function also creates the following user fields for the Highload-block:
+     * - UF_MAKE
+     * - UF_MODEL
+     * - UF_YEAR
+     *
+     * @return array [$hlblockId, $ufMakeId]
+     *   - $hlblockId - The ID of the created Highload-block.
+     *   - $ufMakeId - The ID of the created UF_MAKE user field.
+     *
+     * @throws RuntimeException If the Highload-block or user fields are not created.
+     */
     private function createHLBlockAuto(): array
     {
         $lang = [
@@ -314,6 +353,16 @@ class Installer
         return [$hlblockId, $ufMakeId];
     }
     
+    /**
+     * Creates a user field for the dealerservice module demo data.
+     *
+     * Creates a field 'UF_SUPPORTED_AUTO' of type 'hlblock' for the entity 'PRODUCT'.
+     * The field is multiple, has a sort order of 100, is searchable and is shown in the filter and list.
+     * The field has a label, filter label and help message.
+     *
+     * @param int $hlblockId The ID of the HLBlock created by createHLBlockAuto.
+     * @param int $ufMakeId The ID of the UF_MAKE field created by createHLBlockAuto.
+     */
     private function createUserFields(int $hlblockId, int $ufMakeId): void
     {
         $properties = [
@@ -363,6 +412,11 @@ class Installer
     
     private function createDemoParts(int $sectionId): void
     {
+        if(!Loader::includeModule('iblock') || !Loader::includeModule('catalog'))
+        {
+            throw new RuntimeException("Module 'iblock' or 'catalog' not installed");
+        }
+
         $el = new CIBlockElement;
         $arFields = [
             'IBLOCK_ID' => $this->iblockId,
@@ -376,6 +430,35 @@ class Installer
         if (!$elementId) {
             throw new RuntimeException(
                 "Ошибка создания демо-запчасти: " . ($el->LAST_ERROR ?: 'Неизвестная ошибка')
+            );
+        }
+
+        $productResult = Product::add([
+            'ID' => $elementId,
+            'VAT_ID' => 1,
+            'QUANTITY' => 10,
+            'VAT_INCLUDED' => 'Y',
+            'TYPE' => \Bitrix\Catalog\ProductTable::TYPE_PRODUCT
+        ]);
+
+        if ($productResult->isSuccess()) {
+            $priceResult = Price::add([
+                'PRODUCT_ID' => $elementId,
+                'CATALOG_GROUP_ID' => 1,
+                'PRICE' => 100,
+                'CURRENCY' => 'RUB',
+            ]);
+            
+            if (!$priceResult->isSuccess()) {
+                $priceErrors = $priceResult->getErrorMessages();
+                throw new RuntimeException(
+                    "Ошибка создания демо-запчасти: " . ($priceErrors ?: 'Неизвестная ошибка')
+                );
+            }
+        } else {
+            $productErrors = $productResult->getErrorMessages();
+            throw new RuntimeException(
+                "Ошибка создания демо-запчасти: " . ($productErrors ?: 'Неизвестная ошибка')
             );
         }
     }
