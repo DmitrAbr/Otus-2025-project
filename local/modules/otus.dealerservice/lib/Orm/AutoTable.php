@@ -22,7 +22,7 @@ class AutoTable extends DataManager
     public const REJECTED = 'REJECTED';
     public const IN_WORK = 'IN_WORK';
     public const DONE = 'DONE';
-    
+
     public static function getTableName()
     {
         return 'otus_dealerservice_auto';
@@ -39,11 +39,11 @@ class AutoTable extends DataManager
             	->configureTitle(Loc::getMessage("NAME_FIELD_CLIENT"))
                 ->configureRequired(true),
                 
-            (new IntegerField('CREATED_BY'))
+            (new IntegerField('CREATED_BY_ID'))
             	->configureTitle(Loc::getMessage("NAME_FIELD_CREATED"))
                 ->configureRequired(true),
                 
-            (new IntegerField('UPDATED_BY'))
+            (new IntegerField('UPDATED_BY_ID'))
             	->configureTitle(Loc::getMessage("NAME_FIELD_UPDATED"))
                 ->configureRequired(true),
 
@@ -90,13 +90,13 @@ class AutoTable extends DataManager
             new Reference(
                 'CREATED_BY',
                 UserTable::class,
-                Join::on('this.CREATED_BY', 'ref.ID')
+                Join::on('this.CREATED_BY_ID', 'ref.ID')
             ),
             
             new Reference(
                 'UPDATED_BY',
                 UserTable::class,
-                Join::on('this.UPDATED_BY', 'ref.ID')
+                Join::on('this.UPDATED_BY_ID', 'ref.ID')
             ),
         ];
     }

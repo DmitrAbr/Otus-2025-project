@@ -6,11 +6,12 @@ use Bitrix\Main\EventManager;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Entity\Base;
 use Bitrix\Main\Application;
-use Bitrix\Main\Diag\Debug;
 use Bitrix\Main\Config\Option;
 use Otus\Dealerservice\Orm\AutoTable;
 use Otus\Dealerservice\Demo\Installer;
-use Otus\Dealerservice\Userfields\CarSelectorType;
+use Bitrix\Main\IO\Directory;
+use Bitrix\Main\IO\InvalidPathException;
+use Bitrix\Main\SystemException;
 
 Loc::loadMessages(__FILE__);
 
@@ -44,12 +45,33 @@ class otus_dealerservice extends CModule
     
     function DoInstall()
     {
-    	ModuleManager::RegisterModule($this->MODULE_ID);
-    	$this->installDB();
-    	$this->installEvents();
-    	$this->installDemo();
+        if($this->isVersionD7())
+		{
+            ModuleManager::RegisterModule($this->MODULE_ID);
+            $this->installDB();
+            $this->installEvents();
+            $this->installDemo();
+            $this->installFiles();
+        }
+        else {
+			throw new SystemException(Loc::getMessage("OTUS_DEALERSERVICE_INSTALL_ERROR_VERSION"));
+		}
     }
     
+    function installFiles()
+    {
+        $component_path = $this->getPath(). '/install/components';
+		
+		if(Directory::isDirectoryExists($component_path))
+		{
+			CopyDirFiles($component_path, $_SERVER["DOCUMENT_ROOT"].'/bitrix/components', true, true);
+		}
+		else
+		{
+			throw new InvalidPathException($component_path);
+		}
+    }
+
     function installDB()
     {
     	Loader::IncludeModule($this->MODULE_ID);
@@ -117,9 +139,35 @@ class otus_dealerservice extends CModule
     	$this->uninstallEvents();
     	$this->uninstallDemoData();
         $this->uninstallOptions();
+        $this->uninstallFiles();
     	ModuleManager::UnRegisterModule($this->MODULE_ID);
     }
     
+    function uninstallFiles()
+    {
+        $component_path = $this->getPath(). '/install/components';
+		
+		if(Directory::isDirectoryExists($component_path))
+		{
+			$installed_components = new \DirectoryIterator($component_path);
+			foreach($installed_components as $component)
+			{
+				if($component->isDir() && !$component->isDot())
+				{
+					$target_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/components/'.$component->getFilename();
+					if(Directory::isDirectoryExists($target_path))
+					{
+						Directory::deleteDirectory($target_path);
+					}
+				}
+			}
+		}
+		else
+		{
+			throw new InvalidPathException($component_path);
+		}
+    }        
+
     function uninstallOptions()
     {
     	Option::delete($this->MODULE_ID);
@@ -183,4 +231,21 @@ class otus_dealerservice extends CModule
     {
     	
     }
+
+    public function getPath($notDocumentRoot = false)
+	{
+		if($notDocumentRoot)
+		{
+			return str_ireplace(Application::getDocumentRoot(), '', dirname(__DIR__));
+		}
+		else
+		{
+			return dirname(__DIR__);
+		}
+	}
+
+    public function isVersionD7()
+	{
+		return version_compare(ModuleManager::getVersion('main'), '20.00.00', '>=');
+	}
 }
