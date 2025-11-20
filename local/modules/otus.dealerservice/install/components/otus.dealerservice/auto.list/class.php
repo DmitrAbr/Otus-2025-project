@@ -56,6 +56,7 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
         }
         
         try {
+            $this->arResult["CURRENT_USER_ID"] = $USER->GetID();
             $this->getOptions();
             $this->fillGridInfo();
             $this->fillGridData();
@@ -82,13 +83,21 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                 'prefilters' => [],
                 'postfilters' => [],
             ],
+            'updateAuto' => [
+                'prefilters' => [],
+            ],
+            'getAuto' => [
+                'prefilters' => [],
+            ],
+            'deleteAuto' => [
+                'prefilters' => [],
+            ]
         ];
     }
 
-    public function addAutoAction(array $params)
+    public function deleteAutoAction(array $ids)
     {
         Loader::includeModule(self::MODULE_ID);
-
 
         $response = [
             'success' => false,
@@ -96,20 +105,150 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
         ];
 
         try {
+            // Проверяем, что ids - массив чисел
+            $ids = array_map('intval', $ids);
+            $ids = array_filter($ids, function($id) {
+                return $id > 0;
+            });
+
+            if (empty($ids)) {
+                $response['errors'][] = 'Не указаны автомобили для удаления';
+                return $response;
+            }
+
+            // Удаляем каждый автомобиль
+            foreach ($ids as $id) {
+                $result = AutoTable::delete($id);
+                if (!$result->isSuccess()) {
+                    $response['errors'] = array_merge($response['errors'], $result->getErrorMessages());
+                }
+            }
+
+            // Если ошибок нет, то успех
+            if (empty($response['errors'])) {
+                $response['success'] = true;
+            }
+
+        } catch (\Exception $e) {
+            $response['errors'][] = $e->getMessage();
+        }
+
+        return $response;
+    }
+
+    public function getAutoAction($id)
+    {
+        Loader::includeModule(self::MODULE_ID);
+
+        $response = [
+            'success' => false,
+            'data' => [],
+            'errors' => []
+        ];
+
+        try {
+            $auto = AutoTable::getById($id)->fetch();
+            
+            if ($auto) {
+                $response['success'] = true;
+                $response['data'] = $auto;
+            } else {
+                $response['errors'][] = 'Автомобиль не найден';
+            }
+
+        } catch (\Exception $e) {
+            $response['errors'][] = $e->getMessage();
+        }
+
+        return $response;
+    }
+
+    public function addAutoAction(array $params)
+    {
+        Loader::includeModule(self::MODULE_ID);
+
+        $response = [
+            'success' => false,
+            'errors' => []
+        ];
+
+        try {
+            $currentUserId = (int)($params['UPDATED_BY_ID'] ?? 0);
+            
+            if ($currentUserId === 0) {
+                global $USER;
+                if ($USER && $USER->IsAuthorized()) {
+                    $currentUserId = (int)$USER->GetID();
+                }else
+                {
+                    $response['errors'][] = 'Неавторизованный доступ';
+                    return $response;
+                }
+            }
+
             $data = [
                 'CLIENT_ID' => (int)$params['CLIENT_ID'],
-                'CREATED_BY_ID' => (int)$params['CREATED_BY_ID'],
-                'UPDATED_BY_ID' => (int)$params['UPDATED_BY_ID'],
                 'STATUS' => $params['STATUS'] ?? AutoTable::NEW,
                 'MAKE' => $params['MAKE'] ?? '',
                 'MODEL' => $params['MODEL'] ?? '',
                 'NUMBER' => $params['NUMBER'] ?? '',
-                'YEAR' => isset($params['YEAR']) ? (int)$params['YEAR'] : null,
+                'YEAR' => isset($params['YEAR']) ? (int)$params['YEAR'] : 0,
                 'COLOR' => $params['COLOR'] ?? '',
-                'MILEAGE' => isset($params['MILEAGE']) ? (int)$params['MILEAGE'] : null,
+                'MILEAGE' => isset($params['MILEAGE']) ? (int)$params['MILEAGE'] : 0,
+                'CREATED_BY_ID' => $currentUserId,
+                'UPDATED_BY_ID' => $currentUserId, 
             ];
 
             $result = AutoTable::add($data);
+
+            if ($result->isSuccess()) {
+                $response['success'] = true;
+                $response['id'] = $result->getId();
+            } else {
+                $response['errors'] = $result->getErrorMessages();
+            }
+
+        } catch (\Exception $e) {
+            $response['errors'][] = $e->getMessage();
+        }
+
+        return $response;
+    }
+
+    public function updateAutoAction(array $params)
+    {
+        Loader::includeModule(self::MODULE_ID);
+
+        $response = [
+            'success' => false,
+            'errors' => []
+        ];
+
+        try {
+            if (empty($params['ID'])) {
+                $response['errors'][] = 'Не указан ID автомобиля';
+                return $response;
+            }
+
+            $currentUserId = (int)($params['UPDATED_BY_ID'] ?? 0);
+            if ($currentUserId === 0) {
+                global $USER;
+                if ($USER && $USER->IsAuthorized()) {
+                    $currentUserId = (int)$USER->GetID();
+                }
+            }
+
+            $data = [
+                'MAKE' => $params['MAKE'] ?? '',
+                'MODEL' => $params['MODEL'] ?? '',
+                'NUMBER' => $params['NUMBER'] ?? '',
+                'YEAR' => isset($params['YEAR']) ? (int)$params['YEAR'] : 0,
+                'COLOR' => $params['COLOR'] ?? '',
+                'MILEAGE' => isset($params['MILEAGE']) ? (int)$params['MILEAGE'] : 0,
+                'UPDATED_BY_ID' => $currentUserId,
+            ];
+
+            $result = AutoTable::update((int)$params['ID'], $data);
 
             if ($result->isSuccess()) {
                 $response['success'] = true;
@@ -319,11 +458,14 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                     ],
                     [
                         'text' => 'Редактировать',
-                        'onclick' => 'document.location.href="?op=edit&id=' . $item['ID'] . '"'
+                        'onclick' => "BX.AddAutoWindow.edit(" . $item['ID'] . ", " . json_encode([
+                            'name' => $this->arResult['CLIENT_NAME'],
+                            'id' => $this->arParams['contactID']
+                        ]) . ", '" . (defined('AIR_SITE_TEMPLATE') ? '--air' : '') . "', " . $this->arResult['CURRENT_USER_ID'] . ", '" . $this->arResult['gridId'] . "')"
                     ],
                     [
                         'text' => 'Удалить',
-                        'onclick' => 'if(confirm("Точно удалить автомобиль?")){document.location.href="?op=delete&id=' . $item['ID'] . '"}'
+                        'onclick' => "BX.AutoGrid.deleteOne(" . $item['ID'] . ", '" . $this->arResult['gridId'] . "')"
                     ]
                 ]
             ];
@@ -332,7 +474,7 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
         $pageNav->setRecordCount($dataAuto->getCount());
         $this->arResult['LIST'] = $list;
     }
-    
+
     private function prepareItemData(array $item): array
     {
         if ($item['CREATED_AT'] instanceof DateTime) {

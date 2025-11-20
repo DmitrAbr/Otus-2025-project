@@ -9,7 +9,23 @@ Loc::loadMessages(__FILE__);
 
 \CJSCore::Init(['popup', 'otus.auto_add_window']);
 
+// Подключаем наши скрипты
+$APPLICATION->AddHeadScript($this->GetFolder().'/script.js');
+
 $pageNavigation = $arResult['pageNavigation'];
+
+$onchange = new Onchange();
+$onchange->addAction(
+    [
+        'ACTION' => Actions::CALLBACK,
+        'CONFIRM' => true,
+        'CONFIRM_APPLY_BUTTON'  => 'Подтвердить',
+        'CONFIRM_MESSAGE' => 'Вы действительно хотите удалить выбранные автомобили?',
+        'DATA' => [
+            ['JS' => "deleteSelectedCars('{$arResult['gridId']}')"]
+        ]
+    ]
+);
 ?>
 <div class="workplace">
     <div class="ui-toolbar workplace-toolbar">
@@ -77,15 +93,9 @@ $APPLICATION->IncludeComponent(
                             'ID' => 'delete',
                             'TYPE' => 'BUTTON',
                             'TEXT' => 'Удалить',
-                            'CLASS' => 'icon remove grid-delete-button',
+                            'CLASS' => 'ui-btn ui-btn-link ui-btn-icon-cancel',
+                            'ONCHANGE' => $onchange->toArray(),
                         ],
-                        [ 
-                            'ID' => 'edit', 
-                            'TYPE' => 'BUTTON', 
-                            'TEXT' => 'Редактировать', 
-                            'CLASS' => 'icon edit', 
-                            'ONCHANGE' => '' 
-                        ], 
                     ], 
                 ] 
             ], 
@@ -98,15 +108,47 @@ $APPLICATION->IncludeComponent(
     $clientFields = ['name' => $arResult["CLIENT_NAME"], 'id' => $arParams["contactID"]];
 ?>
 <script>
+    // Функция для удаления выбранных автомобилей (для Action Panel)
+    function deleteSelectedCars(gridId) {
+        if (typeof BX.AutoGrid !== 'undefined' && typeof BX.AutoGrid.deleteSelected === 'function') {
+            BX.AutoGrid.deleteSelected(gridId);
+        } else {
+            console.error('BX.AutoGrid is not defined');
+            // Fallback: стандартное поведение если скрипт не загрузился
+            var grid = BX.Main.gridManager.getInstanceById(gridId);
+            if (grid) {
+                var selectedIds = grid.getRows().getSelectedIds();
+                if (selectedIds.length > 0) {
+                    if (confirm('Вы действительно хотите удалить выбранные автомобили?')) {
+                        BX.ajax.runComponentAction('otus.dealerservice:auto.list', 'deleteAuto', {
+                            mode: 'class',
+                            data: {
+                                ids: selectedIds
+                            }
+                        }).then(function(response) {
+                            if (response.data && response.data.success === true) {
+                                grid.reloadTable();
+                                BX.UI.Notification.Center.notify({
+                                    content: 'Автомобили успешно удалены',
+                                    autoHideDelay: 3000
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+
     BX.ready(function(){
         const buttonAdd = BX('add-button');
-
-        var popup = BX.PopupWindowManager.create();
 
         buttonAdd.addEventListener('click', function(){
             (new BX.AddAutoWindow(
                 <?=json_encode($clientFields)?>,
-                <?=json_encode(defined('AIR_SITE_TEMPLATE') ? '--air' : '')?>
+                <?=json_encode(defined('AIR_SITE_TEMPLATE') ? '--air' : '')?>,
+                <?=json_encode($arResult["CURRENT_USER_ID"])?>,
+                <?=json_encode($arResult["gridId"])?>
             )).init();
         });
     });
