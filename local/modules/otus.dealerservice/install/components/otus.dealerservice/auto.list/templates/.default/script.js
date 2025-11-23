@@ -10,12 +10,10 @@
          * @param {string} gridId - ID грида для обновления
          */
         delete: function(ids, gridId) {
-            // Нормализуем ids в массив
             if (!Array.isArray(ids)) {
                 ids = [ids];
             }
 
-            // Фильтруем валидные ID
             ids = ids.filter(function(id) {
                 return parseInt(id) > 0;
             });
@@ -24,7 +22,6 @@
                 return;
             }
 
-            // Показываем индикатор загрузки
             BX.UI.Notification.Center.notify({
                 content: 'Удаление...',
                 autoHideDelay: 1000
@@ -45,8 +42,6 @@
                         content: successMessage,
                         autoHideDelay: 3000
                     });
-
-                    // Обновляем грид если передан gridId
                     if (gridId) {
                         var grid = BX.Main.gridManager.getInstanceById(gridId);
                         if (grid) {

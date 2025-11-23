@@ -89,6 +89,7 @@ class Installer
         $idUserGroup = $this->createUserGroups();
         $this->createUserFields($hlblockId, $ufMakeId);
         $this->createDemoParts($sectionId);
+        $this->createUserFieldsCrm();
 
         
         Option::set(Constants::MODULE_ID, 'iblock_catalog_section_id', (int)$sectionId);
@@ -98,6 +99,219 @@ class Installer
     }
     
     
+    private function createUserFieldsCrm(): void
+    {
+        $properties = [
+            'UF_CRM_MAKE' => [
+                'ENTITY_ID' => 'CRM_DEAL',
+                'FIELD_NAME' => 'UF_CRM_MAKE',
+                'USER_TYPE_ID' => 'string',
+                'XML_ID' => '',
+                'SORT' => '100',
+                'MULTIPLE' => 'N',
+                'MANDATORY' => 'Y',
+                'SHOW_FILTER' => 'Y',
+                'SHOW_IN_LIST' => 'Y',
+                'EDIT_IN_LIST' => 'Y',
+                'IS_SEARCHABLE' => 'Y',
+                'SETTINGS' => [],
+                'EDIT_FORM_LABEL' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_MAKE'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_MAKE'),
+                ],
+                'LIST_COLUMN_LABEL' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_MAKE'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_MAKE'),
+                ],
+                'LIST_FILTER_LABEL' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_MAKE'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_MAKE'),
+                ],
+                'ERROR_MESSAGE' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_MAKE'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_MAKE'),
+                ],
+                'HELP_MESSAGE' => [
+                    'en' => '',
+                    'ru' => '',
+                ],
+            ],
+            'UF_CRM_MODEL' => [
+                'ENTITY_ID' => 'CRM_DEAL',
+                'FIELD_NAME' => 'UF_CRM_MODEL',
+                'USER_TYPE_ID' => 'string',
+                'XML_ID' => '',
+                'SORT' => '100',
+                'MULTIPLE' => 'N',
+                'MANDATORY' => 'Y',
+                'SHOW_FILTER' => 'Y',
+                'SHOW_IN_LIST' => 'Y',
+                'EDIT_IN_LIST' => 'Y',
+                'IS_SEARCHABLE' => 'Y',
+                'SETTINGS' => [],
+                'EDIT_FORM_LABEL' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_MODEL'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_MODEL'),
+                ],
+                'LIST_COLUMN_LABEL' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_MODEL'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_MODEL'),
+                ],
+                'LIST_FILTER_LABEL' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_MODEL'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_MODEL'),
+                ],
+                'ERROR_MESSAGE' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_MODEL'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_MODEL'),
+                ],
+                'HELP_MESSAGE' => [
+                    'en' => '',
+                    'ru' => '',
+                ],
+            ],
+            'UF_CRM_YEAR' => [
+                'ENTITY_ID' => 'CRM_DEAL',
+                'FIELD_NAME' => 'UF_CRM_YEAR',
+                'USER_TYPE_ID' => 'integer',
+                'XML_ID' => '',
+                'SORT' => '100',
+                'MULTIPLE' => 'N',
+                'MANDATORY' => 'Y',
+                'SHOW_FILTER' => 'Y',
+                'SHOW_IN_LIST' => 'Y',
+                'EDIT_IN_LIST' => 'Y',
+                'IS_SEARCHABLE' => 'Y',
+                'SETTINGS' => [],
+                'EDIT_FORM_LABEL' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_YAER'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_YAER'),
+                ],
+                'LIST_COLUMN_LABEL' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_YAER'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_YAER'),
+                ],
+                'LIST_FILTER_LABEL' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_YAER'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_YAER'),
+                ],
+                'ERROR_MESSAGE' => [
+                    'en' => Loc::getMessage('HLBLOCK_AUTO_YAER'),
+                    'ru' => Loc::getMessage('HLBLOCK_AUTO_YAER'),
+                ],
+                'HELP_MESSAGE' => [
+                    'en' => '',
+                    'ru' => '',
+                ],
+            ],
+            'UF_CRM_MILEAGE' => [
+                'ENTITY_ID' => 'CRM_DEAL',
+                'FIELD_NAME' => 'UF_CRM_MILEAGE',
+                'USER_TYPE_ID' => 'integer',
+                'XML_ID' => '',
+                'SORT' => '100',
+                'MULTIPLE' => 'N',
+                'MANDATORY' => 'N',
+                'SHOW_FILTER' => 'N',
+                'SHOW_IN_LIST' => 'Y',
+                'EDIT_IN_LIST' => 'Y',
+                'IS_SEARCHABLE' => 'Y',
+                'SETTINGS' => [],
+                'EDIT_FORM_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_MILEAGE'),
+                    'ru' => Loc::getMessage('CRM_FIELD_MILEAGE'),
+                ],
+                'LIST_COLUMN_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_MILEAGE'),
+                    'ru' => Loc::getMessage('CRM_FIELD_MILEAGE'),
+                ],
+                'LIST_FILTER_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_MILEAGE'),
+                    'ru' => Loc::getMessage('CRM_FIELD_MILEAGE'),
+                ],
+                'ERROR_MESSAGE' => [
+                    'en' => Loc::getMessage('CRM_FIELD_MILEAGE'),
+                    'ru' => Loc::getMessage('CRM_FIELD_MILEAGE'),
+                ],
+                'HELP_MESSAGE' => [
+                    'en' => '',
+                    'ru' => '',
+                ],
+            ],
+            'UF_CRM_COLOR' => [
+                'ENTITY_ID' => 'CRM_DEAL',
+                'FIELD_NAME' => 'UF_CRM_COLOR',
+                'USER_TYPE_ID' => 'string',
+                'XML_ID' => '',
+                'SORT' => '100',
+                'MULTIPLE' => 'N',
+                'MANDATORY' => 'N',
+                'SHOW_FILTER' => 'N',
+                'SHOW_IN_LIST' => 'Y',
+                'EDIT_IN_LIST' => 'Y',
+                'IS_SEARCHABLE' => 'Y',
+                'SETTINGS' => [],
+                'EDIT_FORM_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_COLOR'),
+                    'ru' => Loc::getMessage('CRM_FIELD_COLOR'),
+                ],
+                'LIST_COLUMN_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_COLOR'),
+                    'ru' => Loc::getMessage('CRM_FIELD_COLOR'),
+                ],
+                'LIST_FILTER_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_COLOR'),
+                    'ru' => Loc::getMessage('CRM_FIELD_COLOR'),
+                ],
+                'ERROR_MESSAGE' => [
+                    'en' => Loc::getMessage('CRM_FIELD_COLOR'),
+                    'ru' => Loc::getMessage('CRM_FIELD_COLOR'),
+                ],
+                'HELP_MESSAGE' => [
+                    'en' => '',
+                    'ru' => '',
+                ],
+            ],
+            'UF_CRM_NUMBER' => [
+                'ENTITY_ID' => 'CRM_DEAL',
+                'FIELD_NAME' => 'UF_CRM_NUMBER',
+                'USER_TYPE_ID' => 'string',
+                'XML_ID' => '',
+                'SORT' => '100',
+                'MULTIPLE' => 'N',
+                'MANDATORY' => 'Y',
+                'SHOW_FILTER' => 'Y',
+                'SHOW_IN_LIST' => 'Y',
+                'EDIT_IN_LIST' => 'Y',
+                'IS_SEARCHABLE' => 'Y',
+                'SETTINGS' => [],
+                'EDIT_FORM_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_NUMBER'),
+                    'ru' => Loc::getMessage('CRM_FIELD_NUMBER'),
+                ],
+                'LIST_COLUMN_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_NUMBER'),
+                    'ru' => Loc::getMessage('CRM_FIELD_NUMBER'),
+                ],
+                'LIST_FILTER_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_NUMBER'),
+                    'ru' => Loc::getMessage('CRM_FIELD_NUMBER'),
+                ],
+                'ERROR_MESSAGE' => [
+                    'en' => Loc::getMessage('CRM_FIELD_NUMBER'),
+                    'ru' => Loc::getMessage('CRM_FIELD_NUMBER'),
+                ],
+                'HELP_MESSAGE' => [
+                    'en' => '',
+                    'ru' => '',
+                ],
+            ],
+        ];
+        foreach ($properties as $key => $property) {
+            $idProperty = UserFieldsHelper::addProperty($property);
+        }
+    }
+
     /**
      * Creates a user group for the dealerservice module demo data.
      *
@@ -165,7 +379,13 @@ class Installer
     		'UF_MAKE',
     		'UF_MODEL',
     		'UF_YEAR',
-    		'UF_SUPPORTED_AUTO'
+    		'UF_SUPPORTED_AUTO',
+            'UF_CRM_NUMBER',
+            'UF_CRM_COLOR',
+            'UF_CRM_MAKE',
+            'UF_CRM_MODEL',
+            'UF_CRM_YEAR',
+            'UF_CRM_MILEAGE',
     	];
     	
     	UserFieldsHelper::deleteProperty($fields);

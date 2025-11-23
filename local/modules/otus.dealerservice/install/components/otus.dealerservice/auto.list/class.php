@@ -105,7 +105,6 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
         ];
 
         try {
-            // Проверяем, что ids - массив чисел
             $ids = array_map('intval', $ids);
             $ids = array_filter($ids, function($id) {
                 return $id > 0;
@@ -116,7 +115,6 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                 return $response;
             }
 
-            // Удаляем каждый автомобиль
             foreach ($ids as $id) {
                 $result = AutoTable::delete($id);
                 if (!$result->isSuccess()) {
@@ -124,7 +122,6 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                 }
             }
 
-            // Если ошибок нет, то успех
             if (empty($response['errors'])) {
                 $response['success'] = true;
             }

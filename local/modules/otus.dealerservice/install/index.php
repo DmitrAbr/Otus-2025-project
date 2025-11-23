@@ -58,6 +58,8 @@ class otus_dealerservice extends CModule
 		}
     }
     
+	
+
     function installFiles()
     {
         $component_path = $this->getPath(). '/install/components';
@@ -106,14 +108,6 @@ class otus_dealerservice extends CModule
     function installEvents()
     {
     	$eventManager = EventManager::getInstance();
-    	
-    	$eventManager->registerEventHandler(
-    		'crm',
-    		'onEntityDetailsTabsInitialized',
-			$this->MODULE_ID,
-			'\\Otus\\Dealerservice\\Events\\ContactTabs',
-			'updateTabs'
-    	);
     	
     	$handlers = $this->getHandlers();
     	
@@ -235,14 +229,6 @@ class otus_dealerservice extends CModule
     {
     	$eventManager = EventManager::getInstance();
     	
-    	$eventManager->unRegisterEventHandler(
-    		'crm',
-    		'onEntityDetailsTabsInitialized',
-			$this->MODULE_ID,
-			'\\Otus\\Dealerservice\\Events\\ContactTabs',
-			'updateTabs'
-    	);
-    	
     	$handlers = $this->getHandlers();
         foreach ($handlers as $handler) {
             $eventManager->unRegisterEventHandler(
@@ -266,7 +252,21 @@ class otus_dealerservice extends CModule
     
     function getHandlers()
     {
-    	
+		Loader::IncludeModule($this->MODULE_ID);
+    	return [
+			[
+				'fromModuleId' => 'crm',
+				'eventType' => 'onEntityDetailsTabsInitialized',
+				'toClass' => '\\Otus\\Dealerservice\\Events\\ContactTabs',
+				'toMethod' => 'updateTabs',
+			],
+			[
+				'fromModuleId' => 'crm',
+				'eventType' => 'OnBeforeCrmDealAdd',
+				'toClass' => '\\Otus\\Dealerservice\\Events\\CrmAddHandler',
+				'toMethod' => 'OnBeforeCrmDealAddHandler',
+			],
+		];
     }
 
     public function getPath($notDocumentRoot = false)

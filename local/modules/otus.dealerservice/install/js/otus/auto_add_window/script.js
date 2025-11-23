@@ -24,18 +24,16 @@
                 
             var buttonText = this.isEditMode ? 'Сохранить' : 'Добавить';
 
-            // Используем ID автомобиля для создания уникального ID popup
             var autoId = this.isEditMode && this.autoData.ID ? this.autoData.ID : 0;
             var popupId = 'add_auto_window_' + autoId;
 
-            // Закрываем и уничтожаем предыдущий popup с таким же ID
             var existingPopup = BX.PopupWindowManager.getPopupById(popupId);
             if (existingPopup) {
                 existingPopup.close();
                 existingPopup.destroy();
             }
 
-            var self = this; // Сохраняем контекст для использования в событиях
+            var self = this;
 
             this.popup = BX.PopupWindowManager.create(popupId, null, {
                 content: this.createForm(),
@@ -46,7 +44,7 @@
                 events: {
                     onPopupClose: function() {
                         this.destroy();
-                        self.popup = null; // Очищаем ссылку
+                        self.popup = null;
                     }
                 },
                 buttons: [
@@ -235,7 +233,7 @@
 
             var action = this.isEditMode ? 'updateAuto' : 'addAuto';
             
-            var self = this; // Сохраняем контекст для использования в колбэках
+            var self = this;
 
             BX.ajax.runComponentAction('otus.dealerservice:auto.list', action, {
                 mode: 'class',
@@ -243,7 +241,6 @@
                     params: data
                 } 
             }).then(function(response) {
-                // Восстанавливаем кнопку в then
                 addButton.textContent = originalText;
                 addButton.disabled = false;
 
