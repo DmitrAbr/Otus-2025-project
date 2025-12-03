@@ -7,6 +7,7 @@ use Bitrix\Main\UI\Filter\Options as FilterOptions;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Type\DateTime;
 use Otus\Dealerservice\Orm\AutoTable;
+use Otus\Dealerservice\Auto;
 use Bitrix\Main\Localization\Loc;
 use Otus\Dealerservice\Helpers\Actions;
 use Bitrix\Main\ErrorCollection;
@@ -91,8 +92,93 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
             ],
             'deleteAuto' => [
                 'prefilters' => [],
-            ]
+            ],
+            'getAutoDeals' => [
+                'prefilters' => [],
+            ],
         ];
+    }
+
+    public function getAutoDealsAction(int $id): array
+    {
+        Loader::includeModule(self::MODULE_ID);
+
+        $response = [
+            'success' => false,
+            'errors' => []
+        ];
+
+        try {
+            $deals = Auto::getDeals($id);
+            
+            $groupedDeals = [];
+            foreach($deals as $deal) {
+                $dealId = $deal['ID'];
+                
+                if (!isset($groupedDeals[$dealId])) {
+                    // Копируем все поля, кроме полей товаров
+                    $groupedDeals[$dealId] = array_diff_key($deal, [
+                        'PRODUCT_NAME' => '',
+                        'PRODUCT_QUANTITY' => ''
+                    ]);
+                    $groupedDeals[$dealId]['PRODUCTS'] = [];
+                }
+                
+                // Добавляем товар, если название товара не пустое
+                if (!empty($deal['PRODUCT_NAME'])) {
+                    $groupedDeals[$dealId]['PRODUCTS'][] = [
+                        'NAME' => $deal['PRODUCT_NAME'],
+                        'QUANTITY' => $deal['PRODUCT_QUANTITY'] ?? 0
+                    ];
+                }
+            }
+            
+            $groupedDeals = array_values($groupedDeals);
+            
+            foreach($groupedDeals as &$deal) {
+                $nameParts = array_filter([
+                    $deal['ASSIGNED_BY_NAME'] ?? '',
+                    $deal['ASSIGNED_BY_LAST_NAME'] ?? '',
+                    $deal['ASSIGNED_BY_SECOND_NAME'] ?? ''
+                ]);
+                
+                $deal['ASSIGNED_BY_FULL_NAME'] = trim(implode(' ', $nameParts));
+                
+                // Если нет имени, используем ID
+                if (empty($deal['ASSIGNED_BY_FULL_NAME']) && !empty($deal['ASSIGNED_BY_ID'])) {
+                    $deal['ASSIGNED_BY_FULL_NAME'] = 'ID: ' . $deal['ASSIGNED_BY_ID'];
+                }
+            }
+            unset($deal); 
+            
+            $stageList = [];
+            if (!empty($groupedDeals)) {
+                $categoryIds = array_column($groupedDeals, 'CATEGORY_ID');
+                $categoryIds = array_filter(array_unique($categoryIds));
+                
+                foreach($categoryIds as $categoryId) {
+                    $categoryStages = \Bitrix\Crm\Category\DealCategory::getStageList($categoryId);
+                    if (is_array($categoryStages)) {
+                        $stageList = array_merge($stageList, $categoryStages);
+                    }
+                }
+                
+                if (empty($stageList)) {
+                    $stageList = \Bitrix\Crm\Category\DealCategory::getStageList(0);
+                }
+            }
+
+            $response['data'] = [
+                'deals' => $groupedDeals, 
+                'stages' => $stageList 
+            ];
+            $response['success'] = true;
+
+        } catch (\Exception $e) {
+            $response['errors'][] = $e->getMessage();
+        }
+
+        return $response;
     }
 
     public function deleteAutoAction(array $ids)
@@ -490,7 +576,7 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
         );
         
         $item['TITLE'] = sprintf(
-            '<a href="?op=view&id=%s" class="auto-title-link" title="Перейти к просмотру">%s</a>',
+            '<span class="auto-title-link" data-auto-id="%s" style="color: #2067b0; cursor: pointer; text-decoration: underline;" title="Перейти к просмотру">%s</span>',
             $item['ID'],
             htmlspecialcharsbx($carTitle)
         );

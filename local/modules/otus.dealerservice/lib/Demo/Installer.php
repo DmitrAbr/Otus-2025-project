@@ -306,6 +306,40 @@ class Installer
                     'ru' => '',
                 ],
             ],
+            'UF_CRM_AUTO_ID' => [
+                'ENTITY_ID' => 'CRM_DEAL',
+                'FIELD_NAME' => 'UF_CRM_AUTO_ID',
+                'USER_TYPE_ID' => 'integer',
+                'XML_ID' => '',
+                'SORT' => '100',
+                'MULTIPLE' => 'N',
+                'MANDATORY' => 'N',
+                'SHOW_FILTER' => 'N',
+                'SHOW_IN_LIST' => 'N',
+                'EDIT_IN_LIST' => 'N',
+                'IS_SEARCHABLE' => 'N',
+                'SETTINGS' => [],
+                'EDIT_FORM_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_AUTO'),
+                    'ru' => Loc::getMessage('CRM_FIELD_AUTO'),
+                ],
+                'LIST_COLUMN_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_AUTO'),
+                    'ru' => Loc::getMessage('CRM_FIELD_AUTO'),
+                ],
+                'LIST_FILTER_LABEL' => [
+                    'en' => Loc::getMessage('CRM_FIELD_AUTO'),
+                    'ru' => Loc::getMessage('CRM_FIELD_AUTO'),
+                ],
+                'ERROR_MESSAGE' => [
+                    'en' => Loc::getMessage('CRM_FIELD_AUTO'),
+                    'ru' => Loc::getMessage('CRM_FIELD_AUTO'),
+                ],
+                'HELP_MESSAGE' => [
+                    'en' => '',
+                    'ru' => '',
+                ],
+            ],
         ];
         foreach ($properties as $key => $property) {
             $idProperty = UserFieldsHelper::addProperty($property);
@@ -386,6 +420,7 @@ class Installer
             'UF_CRM_MODEL',
             'UF_CRM_YEAR',
             'UF_CRM_MILEAGE',
+            'UF_CRM_AUTO_ID'
     	];
     	
     	UserFieldsHelper::deleteProperty($fields);

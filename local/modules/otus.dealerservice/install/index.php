@@ -52,13 +52,21 @@ class otus_dealerservice extends CModule
             $this->installEvents();
             $this->installDemo();
             $this->installFiles();
+			$this->installAgents();
         }
         else {
 			throw new SystemException(Loc::getMessage("OTUS_DEALERSERVICE_INSTALL_ERROR_VERSION"));
 		}
     }
     
-	
+	function installAgents()
+	{
+		\CAgent::AddAgent(
+		"Otus\Dealerservice\Agents\UpdateCountParts::updateCountParts();", 
+		$this->MODULE_ID, 
+		"N", 
+		86400);
+	}
 
     function installFiles()
     {
@@ -150,9 +158,18 @@ class otus_dealerservice extends CModule
     	$this->uninstallDemoData();
         $this->uninstallOptions();
         $this->uninstallFiles();
+		$this->uninstallAgents();
     	ModuleManager::UnRegisterModule($this->MODULE_ID);
     }
     
+	function uninstallAgents()
+	{
+		\CAgent::RemoveAgent(
+		"Otus\Dealerservice\Agents\UpdateCountParts::updateCountParts();",
+		$this->MODULE_ID
+		);
+	}
+
     function uninstallFiles()
     {
         $component_path = $this->getPath(). '/install/components';

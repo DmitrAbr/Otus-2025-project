@@ -15,3 +15,4 @@ $MESS["PRODUCT_SUPPORTED_AUTO"] = "Поддерживаемые автомоби
 $MESS["CRM_FIELD_COLOR"] = "Цвет";
 $MESS["CRM_FIELD_NUMBER"] = "Номер";
 $MESS["NAME_GROUP_GARAGE"] = "Otus: Пользователи имеющие доступ к гаражу клиента";
+$MESS["CRM_FIELD_AUTO"] = "ID Автомобиля";

@@ -7,7 +7,7 @@ $this->setFrameMode(true);
 
 Loc::loadMessages(__FILE__);
 
-\CJSCore::Init(['popup', 'otus.auto_add_window']);
+\CJSCore::Init(['popup', 'otus.auto_add_window', 'otus.auto_popup']);
 
 // Подключаем наши скрипты
 $APPLICATION->AddHeadScript($this->GetFolder().'/script.js');
@@ -108,13 +108,11 @@ $APPLICATION->IncludeComponent(
     $clientFields = ['name' => $arResult["CLIENT_NAME"], 'id' => $arParams["contactID"]];
 ?>
 <script>
-    // Функция для удаления выбранных автомобилей (для Action Panel)
     function deleteSelectedCars(gridId) {
         if (typeof BX.AutoGrid !== 'undefined' && typeof BX.AutoGrid.deleteSelected === 'function') {
             BX.AutoGrid.deleteSelected(gridId);
         } else {
             console.error('BX.AutoGrid is not defined');
-            // Fallback: стандартное поведение если скрипт не загрузился
             var grid = BX.Main.gridManager.getInstanceById(gridId);
             if (grid) {
                 var selectedIds = grid.getRows().getSelectedIds();
@@ -150,6 +148,16 @@ $APPLICATION->IncludeComponent(
                 <?=json_encode($arResult["CURRENT_USER_ID"])?>,
                 <?=json_encode($arResult["gridId"])?>
             )).init();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('auto-title-link') && e.target.dataset.autoId) {
+                e.preventDefault();
+                (new BX.AutoPopup(
+                    e.target.dataset.autoId,
+                    <?=json_encode($clientFields)?>
+                )).init();
+            }
         });
     });
 </script>
