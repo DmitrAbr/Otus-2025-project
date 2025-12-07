@@ -116,7 +116,6 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                 $dealId = $deal['ID'];
                 
                 if (!isset($groupedDeals[$dealId])) {
-                    // Копируем все поля, кроме полей товаров
                     $groupedDeals[$dealId] = array_diff_key($deal, [
                         'PRODUCT_NAME' => '',
                         'PRODUCT_QUANTITY' => ''
@@ -124,7 +123,6 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                     $groupedDeals[$dealId]['PRODUCTS'] = [];
                 }
                 
-                // Добавляем товар, если название товара не пустое
                 if (!empty($deal['PRODUCT_NAME'])) {
                     $groupedDeals[$dealId]['PRODUCTS'][] = [
                         'NAME' => $deal['PRODUCT_NAME'],
@@ -144,7 +142,6 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                 
                 $deal['ASSIGNED_BY_FULL_NAME'] = trim(implode(' ', $nameParts));
                 
-                // Если нет имени, используем ID
                 if (empty($deal['ASSIGNED_BY_FULL_NAME']) && !empty($deal['ASSIGNED_BY_ID'])) {
                     $deal['ASSIGNED_BY_FULL_NAME'] = 'ID: ' . $deal['ASSIGNED_BY_ID'];
                 }
@@ -537,7 +534,9 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                     [
                         'text' => 'Просмотр',
                         'default' => true,
-                        'onclick' => 'document.location.href="?op=view&id=' . $item['ID'] . '"'
+                        'onclick' => '(new BX.AutoPopup('.$item["ID"].', '.json_encode([
+                            'name' => $this->arResult['CLIENT_NAME'],
+                            'id' => $this->arParams['contactID']]).')).init()'
                     ],
                     [
                         'text' => 'Редактировать',

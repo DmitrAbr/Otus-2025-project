@@ -9,8 +9,6 @@ Loc::loadMessages(__FILE__);
 
 \CJSCore::Init(['popup', 'otus.auto_add_window', 'otus.auto_popup']);
 
-// Подключаем наши скрипты
-$APPLICATION->AddHeadScript($this->GetFolder().'/script.js');
 
 $pageNavigation = $arResult['pageNavigation'];
 

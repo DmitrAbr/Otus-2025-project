@@ -12,6 +12,11 @@ use Bitrix\Main\Type\DateTime;
 use Bitrix\Main\UserTable;
 use Bitrix\Crm\ContactTable;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\ORM\Event;
+use Bitrix\Main\ORM\EventResult;
+use Bitrix\Crm\DealTable;
+use Bitrix\Main\ORM\EntityError;
+use Bitrix\Main\Loader;
 
 Loc::loadMessages(__FILE__);
 
@@ -64,10 +69,12 @@ class AutoTable extends DataManager
             	->configureTitle(Loc::getMessage("NAME_FIELD_YEAR")),
             
             (new StringField('COLOR'))
-            	->configureTitle(Loc::getMessage("NAME_FIELD_COLOR")),
+            	->configureTitle(Loc::getMessage("NAME_FIELD_COLOR"))
+                ->configureNullable(true),
             
             (new IntegerField('MILEAGE'))
-            	->configureTitle(Loc::getMessage("NAME_FIELD_MILEAGE")),
+            	->configureTitle(Loc::getMessage("NAME_FIELD_MILEAGE"))
+                ->configureNullable(true),
 
             (new DatetimeField('CREATED_AT'))
                 ->configureDefaultValue(function() {
@@ -106,66 +113,35 @@ class AutoTable extends DataManager
         $connection->dropTable(self::getTableName());
     }
 
-    public static function demoDataUpload()
+    public static function onAfterUpdate(Event $event)
     {
-        $autos = [
-            [
-                'CLIENT_ID' => 1,
-                'CREATED_BY_ID' => 1,
-                'UPDATED_BY_ID' => 1,
-                'STATUS' => self::NEW,
-                'MAKE' => 'BMW',
-                'MODEL' => 'X5',
-                'MILEAGE' => 10000,
-                'NUMBER' => 'A123BC',
-                'YEAR' => 2019,
-                'COLOR' => 'Желтый',
-            ],
-            [
-                'CLIENT_ID' => 5,
-                'CREATED_BY_ID' => 3,
-                'UPDATED_BY_ID' => 7,
-                'STATUS' => self::REJECTED,
-                'MAKE' => 'Toyota',
-                'MILEAGE' => 558923,
-                'MODEL' => 'Camry',
-                'NUMBER' => 'E456KX',
-                'YEAR' => 2024,
-                'COLOR' => 'Черный',
-            ],
-            [
-                'CLIENT_ID' => 5,
-                'CREATED_BY_ID' => 5,
-                'UPDATED_BY_ID' => 7,
-                'STATUS' => self::IN_WORK,
-                'MAKE' => 'Ford',
-                'MILEAGE' => 75463,
-                'MODEL' => 'Focus',
-                'NUMBER' => 'K123OM',
-                'YEAR' => 1999,
-                'COLOR' => 'Синий',
-            ],
-            [
-                'CLIENT_ID' => 3,
-                'CREATED_BY_ID' => 5,
-                'UPDATED_BY_ID' => 7,
-                'STATUS' => self::DONE,
-                'MAKE' => 'Chervolet',
-                'MILEAGE' => 8456,
-                'MODEL' => 'Camaro',
-                'NUMBER' => 'T521TT',
-                'YEAR' => 2019,
-                'COLOR' => 'Красный',
-            ],
-        ];
-
-        foreach($autos as $auto)
-        {
-            $result = self::add($auto);
-            if(!$result->isSuccess())
-            {   
-                throw new \RuntimeException(print_r($result->getErrorMessages(), true));
+        Loader::IncludeModule('crm');
+        $result = new EventResult;
+        $data = $event->getParameter("fields");
+        $id = $event->getParameter("id");
+        
+        $deals = DealTable::getList([
+            'filter' => ['UF_CRM_AUTO_ID' => $id],
+        ])->fetchAll();
+            
+            if(!empty($deals))
+            {
+                foreach($deals as $deal)
+                {
+                    $deal["UF_CRM_MAKE"] = $data["MAKE"];
+                    $deal["UF_CRM_MODEL"] = $data["MODEL"];
+                    $deal["UF_CRM_NUMBER"] = $data["NUMBER"];
+                    $deal["UF_CRM_YEAR"] = $data["YEAR"];
+                    $deal["UF_CRM_COLOR"] = $data["COLOR"];
+                    $deal["UF_CRM_MILEAGE"] = $data["MILEAGE"];
+                    $res = DealTable::update($deal["ID"], $deal);
+                    if(!$res->isSuccess())
+                    {
+                        $result->addError(new EntityError($res->getErrorMessages()));
+                    }
+                }
             }
-        }
+
+        return $result;
     }
 }

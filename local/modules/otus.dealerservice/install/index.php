@@ -12,6 +12,7 @@ use Otus\Dealerservice\Demo\Installer;
 use Bitrix\Main\IO\Directory;
 use Bitrix\Main\IO\InvalidPathException;
 use Bitrix\Main\SystemException;
+use Otus\Dealerservice\Events\AutoUpdateHandler;
 
 Loc::loadMessages(__FILE__);
 
@@ -282,6 +283,12 @@ class otus_dealerservice extends CModule
 				'eventType' => 'OnBeforeCrmDealAdd',
 				'toClass' => '\\Otus\\Dealerservice\\Events\\CrmAddHandler',
 				'toMethod' => 'OnBeforeCrmDealAddHandler',
+			],
+			[
+				'fromModuleId' => 'crm',
+				'eventType' => 'OnAfterCrmDealUpdate',
+				'toClass' => '\\Otus\\Dealerservice\\Events\\CrmUpdateHandler',
+				'toMethod' => 'OnAfterCrmDealUpdateHandler',
 			],
 		];
     }

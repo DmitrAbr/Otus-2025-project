@@ -84,7 +84,6 @@
             });
         },
 
-        // Остальной код остается без изменений...
         showAutoPopup: function() {
             var self = this;
             var popupId = 'auto-popup-' + this.autoId;
@@ -191,7 +190,6 @@
                             this.createInfoRow('Год выпуска', data.YEAR || '—'),
                             this.createInfoRow('Цвет', data.COLOR || '—'),
                             this.createInfoRow('Пробег', data.MILEAGE ? this.formatMileage(data.MILEAGE) : '—'),
-                            this.createInfoRow('ID', data.ID || '—'),
                             this.createInfoRow('Статус', this.getStatusText(data.STATUS) || '—')
                         ]
                     }),
@@ -215,15 +213,6 @@
         },
         
         createDealsContent: function() {
-            if (this.loadingDeals) {
-                return BX.create('div', {
-                    props: {
-                        className: 'auto-popup-loading'
-                    },
-                    text: 'Загрузка сделок...'
-                });
-            }
-            
             if (!this.deals || this.deals.length === 0) {
                 return BX.create('div', {
                     props: {
