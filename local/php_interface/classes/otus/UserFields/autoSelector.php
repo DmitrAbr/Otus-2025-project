@@ -27,9 +27,6 @@ class BrandModelYearType extends BaseType
         ];
     }
 
-    /**
-     * Get field edit form HTML
-     */
     public static function GetEditFormHTML($arUserField, $arHtmlControl): string
     {
         Loader::includeModule('highloadblock');

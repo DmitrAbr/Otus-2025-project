@@ -1,0 +1,323 @@
+.auto-title-link {
+    color: #2c3e50;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.auto-title-link:hover {
+    color: #3498db;
+    text-decoration: underline;
+}
+
+.ui-toolbar-left {
+    margin-right: 10px;
+}
+
+.auto-popup-window .popup-window-content {
+    padding: 0;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.auto-popup-container {
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    background: #fff;
+}
+
+.auto-popup-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.auto-popup-title {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    flex: 1;
+    min-width: 250px;
+}
+
+.auto-popup-status {
+    display: flex;
+    align-items: center;
+}
+
+.auto-popup-status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.auto-popup-status-rejected {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.auto-popup-status-done {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.auto-popup-status-in_work {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.auto-popup-status-new {
+    background-color: #fff3e0;
+    color: #ef6c00;
+}
+
+/* Сетка с информацией */
+.auto-popup-grid {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+    min-height: 300px;
+}
+
+.auto-popup-column {
+    flex: 1;
+}
+
+.auto-popup-auto-info {
+    border-right: 1px solid #eee;
+    padding-right: 20px;
+}
+
+.auto-popup-deals {
+    min-width: 350px;
+}
+
+.auto-popup-deals-title {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.auto-popup-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.auto-popup-info-row:last-child {
+    border-bottom: none;
+}
+
+.auto-popup-info-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    min-width: 120px;
+}
+
+.auto-popup-info-value {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    text-align: right;
+    word-break: break-word;
+}
+
+.auto-popup-deals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.auto-popup-deal-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.2s ease;
+}
+
+.auto-popup-deal-item:hover {
+    background: #f1f3f5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.auto-popup-deal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.auto-popup-deal-title-link {
+    text-decoration: none;
+    color: #2067b0;
+    font-weight: 500;
+    font-size: 14px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.auto-popup-deal-title-link:hover {
+    color: #164c8a;
+    text-decoration: underline;
+}
+
+.auto-popup-deal-stage {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.auto-popup-deal-info {
+    margin-bottom: 12px;
+}
+
+.auto-popup-deal-info-row {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 5px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.auto-popup-deal-info-row:last-child {
+    margin-bottom: 0;
+}
+
+.auto-popup-deal-info-label {
+    font-weight: 500;
+    min-width: 100px;
+    margin-right: 5px;
+}
+
+.auto-popup-deal-info-value {
+    color: #333;
+    font-weight: 400;
+}
+
+.auto-popup-user-link {
+    color: #2067b0;
+    text-decoration: none;
+}
+
+.auto-popup-user-link:hover {
+    text-decoration: underline;
+    color: #164c8a;
+}
+
+.auto-popup-deal-products {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.auto-popup-deal-products-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.auto-popup-deal-products-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.auto-popup-deal-product {
+    font-size: 12px;
+    color: #555;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px dotted #eee;
+}
+
+.auto-popup-deal-product:last-child {
+    border-bottom: none;
+}
+
+.auto-popup-deal-product-name {
+    flex: 1;
+}
+
+.auto-popup-deal-product-quantity {
+    color: #666;
+    margin: 0 5px;
+}
+
+
+.auto-popup-no-deals,
+.auto-popup-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    font-size: 14px;
+}
+
+
+@media (max-width: 768px) {
+    .auto-popup-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .auto-popup-auto-info {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        padding-right: 0;
+        padding-bottom: 20px;
+    }
+    
+    .auto-popup-deals {
+        min-width: auto;
+    }
+    
+    .auto-popup-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .auto-popup-title {
+        min-width: auto;
+    }
+    
+    .auto-popup-deal-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .auto-popup-deal-title-link {
+        min-width: auto;
+    }
+}

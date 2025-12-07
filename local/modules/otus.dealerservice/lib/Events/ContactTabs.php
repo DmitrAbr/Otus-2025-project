@@ -2,11 +2,10 @@
 
 namespace Otus\Dealerservice\Events;
 
-use Otus\Dealerservice\Events\AutoTable;
+use Otus\Dealerservice\Orm\AutoTable;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\EventResult;
 use Bitrix\Main\Event;
-use Bitrix\Main\Diag\Debug;
 
 Loc::loadMessages(__FILE__);
 
@@ -19,17 +18,23 @@ class ContactTabs
 		if($entityTypeId === \CCrmOwnerType::Contact)
 		{
 			$tabs = $event->getParameter('tabs');
-		
+
 			$tabs[]=[
 				'id' => 'tab_garage',
 				'name' => Loc::getMessage("OTUS_DEALERSERVICE_TAB_TITLE"),
 				'enabled' => true,
 				'loader' => [
 					'serviceUrl' => sprintf(
-						'',
+						'/bitrix/components/otus.dealerservice/auto.list/lazyload.ajax.php?site=%s&%s',
 						\SITE_ID,
 						\bitrix_sessid_get(),
 					),	
+					'componentData' => [
+						'template' => '',
+						'params' => [
+							'contactID' => $event->getParameter('entityID')			
+						]
+					]
 				],
 			];
 			

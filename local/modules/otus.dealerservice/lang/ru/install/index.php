@@ -6,3 +6,4 @@ $MESS["OTUS_MODULE_DESCRIPTION_DEALER"] = "Модуль добавляет фу�
 	3. Создает воронку для обслуживание автомобилей";
 $MESS["OTUS_PARTNER_NAME"] = "Дмитрий Абрамов";
 $MESS["OTUS_PARTNER_URI"] = "https://github.com/DmitrAbr";
+$MESS["OTUS_DEALERSERVICE_INSTALL_ERROR_VERSION"] = "Версия ядра не поддерживает модуль";

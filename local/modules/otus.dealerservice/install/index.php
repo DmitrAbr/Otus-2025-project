@@ -6,10 +6,13 @@ use Bitrix\Main\EventManager;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Entity\Base;
 use Bitrix\Main\Application;
-use Bitrix\Main\Diag\Debug;
+use Bitrix\Main\Config\Option;
 use Otus\Dealerservice\Orm\AutoTable;
 use Otus\Dealerservice\Demo\Installer;
-use Otus\Dealerservice\Userfields\CarSelectorType;
+use Bitrix\Main\IO\Directory;
+use Bitrix\Main\IO\InvalidPathException;
+use Bitrix\Main\SystemException;
+use Otus\Dealerservice\Events\AutoUpdateHandler;
 
 Loc::loadMessages(__FILE__);
 
@@ -43,12 +46,55 @@ class otus_dealerservice extends CModule
     
     function DoInstall()
     {
-    	ModuleManager::RegisterModule($this->MODULE_ID);
-    	$this->installDB();
-    	$this->installEvents();
-    	$this->installDemo();
+        if($this->isVersionD7())
+		{
+            ModuleManager::RegisterModule($this->MODULE_ID);
+            $this->installDB();
+            $this->installEvents();
+            $this->installDemo();
+            $this->installFiles();
+			$this->installAgents();
+        }
+        else {
+			throw new SystemException(Loc::getMessage("OTUS_DEALERSERVICE_INSTALL_ERROR_VERSION"));
+		}
     }
     
+	function installAgents()
+	{
+		\CAgent::AddAgent(
+		"Otus\Dealerservice\Agents\UpdateCountParts::updateCountParts();", 
+		$this->MODULE_ID, 
+		"N", 
+		86400);
+	}
+
+    function installFiles()
+    {
+        $component_path = $this->getPath(). '/install/components';
+        $to_component_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/components';
+		$js_path = $this->getPath(). '/install/js';
+        $to_js_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/js';
+
+        if(Directory::isDirectoryExists($js_path))
+        {
+            CopyDirFiles($js_path, $to_js_path, true, true);
+        }
+        else
+        {
+            throw new InvalidPathException($js_path);
+        }
+
+		if(Directory::isDirectoryExists($component_path))
+		{
+			CopyDirFiles($component_path, $to_component_path, true, true);
+		}
+		else
+		{
+			throw new InvalidPathException($component_path);
+		}
+    }
+
     function installDB()
     {
     	Loader::IncludeModule($this->MODULE_ID);
@@ -60,6 +106,10 @@ class otus_dealerservice extends CModule
     		if(!Application::getConnection($entity::getConnectionName())->isTableExists($entity::getTableName()))
     		{
     			Base::getInstance($entity)->createDbTable();
+                if(method_exists($entity, 'demoDataUpload'))
+                {
+                    $entity::demoDataUpload();
+                }
     		}
     	}
     }
@@ -67,14 +117,6 @@ class otus_dealerservice extends CModule
     function installEvents()
     {
     	$eventManager = EventManager::getInstance();
-    	
-    	$eventManager->registerEventHandler(
-    		'crm',
-    		'onEntityDetailsTabsInitialized',
-			$this->MODULE_ID,
-			'\\Otus\\Dealerservice\\Events\\ContactTabs',
-			'updateTabs'
-    	);
     	
     	$handlers = $this->getHandlers();
     	
@@ -115,9 +157,71 @@ class otus_dealerservice extends CModule
     	$this->uninstallDB();
     	$this->uninstallEvents();
     	$this->uninstallDemoData();
+        $this->uninstallOptions();
+        $this->uninstallFiles();
+		$this->uninstallAgents();
     	ModuleManager::UnRegisterModule($this->MODULE_ID);
     }
     
+	function uninstallAgents()
+	{
+		\CAgent::RemoveAgent(
+		"Otus\Dealerservice\Agents\UpdateCountParts::updateCountParts();",
+		$this->MODULE_ID
+		);
+	}
+
+    function uninstallFiles()
+    {
+        $component_path = $this->getPath(). '/install/components';
+		$js_path = $this->getPath(). '/install/js';
+
+        if(Directory::isDirectoryExists($js_path))
+		{
+			$installed_components = new \DirectoryIterator($js_path);
+			foreach($installed_components as $component)
+			{
+				if($component->isDir() && !$component->isDot())
+				{
+					$target_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/js/'.$component->getFilename();
+					if(Directory::isDirectoryExists($target_path))
+					{
+						Directory::deleteDirectory($target_path);
+					}
+				}
+			}
+		}
+		else
+		{
+			throw new InvalidPathException($component_path);
+		}
+
+		if(Directory::isDirectoryExists($component_path))
+		{
+			$installed_components = new \DirectoryIterator($component_path);
+			foreach($installed_components as $component)
+			{
+				if($component->isDir() && !$component->isDot())
+				{
+					$target_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/components/'.$component->getFilename();
+					if(Directory::isDirectoryExists($target_path))
+					{
+						Directory::deleteDirectory($target_path);
+					}
+				}
+			}
+		}
+		else
+		{
+			throw new InvalidPathException($component_path);
+		}
+    }        
+
+    function uninstallOptions()
+    {
+    	Option::delete($this->MODULE_ID);
+    }
+
     function uninstallDemoData()
     {
     	Loader::IncludeModule($this->MODULE_ID);
@@ -143,14 +247,6 @@ class otus_dealerservice extends CModule
     {
     	$eventManager = EventManager::getInstance();
     	
-    	$eventManager->unRegisterEventHandler(
-    		'crm',
-    		'onEntityDetailsTabsInitialized',
-			$this->MODULE_ID,
-			'\\Otus\\Dealerservice\\Events\\ContactTabs',
-			'updateTabs'
-    	);
-    	
     	$handlers = $this->getHandlers();
         foreach ($handlers as $handler) {
             $eventManager->unRegisterEventHandler(
@@ -174,6 +270,43 @@ class otus_dealerservice extends CModule
     
     function getHandlers()
     {
-    	
+		Loader::IncludeModule($this->MODULE_ID);
+    	return [
+			[
+				'fromModuleId' => 'crm',
+				'eventType' => 'onEntityDetailsTabsInitialized',
+				'toClass' => '\\Otus\\Dealerservice\\Events\\ContactTabs',
+				'toMethod' => 'updateTabs',
+			],
+			[
+				'fromModuleId' => 'crm',
+				'eventType' => 'OnBeforeCrmDealAdd',
+				'toClass' => '\\Otus\\Dealerservice\\Events\\CrmAddHandler',
+				'toMethod' => 'OnBeforeCrmDealAddHandler',
+			],
+			[
+				'fromModuleId' => 'crm',
+				'eventType' => 'OnAfterCrmDealUpdate',
+				'toClass' => '\\Otus\\Dealerservice\\Events\\CrmUpdateHandler',
+				'toMethod' => 'OnAfterCrmDealUpdateHandler',
+			],
+		];
     }
+
+    public function getPath($notDocumentRoot = false)
+	{
+		if($notDocumentRoot)
+		{
+			return str_ireplace(Application::getDocumentRoot(), '', dirname(__DIR__));
+		}
+		else
+		{
+			return dirname(__DIR__);
+		}
+	}
+
+    public function isVersionD7()
+	{
+		return version_compare(ModuleManager::getVersion('main'), '20.00.00', '>=');
+	}
 }
