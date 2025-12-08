@@ -9,6 +9,11 @@ use Bitrix\Main\Diag\Debug;
 
 class UpdateCountParts
 {
+    /**
+     * Update quantity of parts in catalog by quantity in warehouse.
+     *
+     * @return string
+     */
     public static function updateCountParts(): string
     {
         try {

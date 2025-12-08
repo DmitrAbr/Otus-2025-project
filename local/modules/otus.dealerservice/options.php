@@ -12,7 +12,6 @@ Loader::includeModule('highloadblock');
 Loader::includeModule('iblock');
 Loader::includeModule($module_id);
 
-// Функция для получения значения с приоритетом из запроса
 function getSettingValue($module_id, $key, $default = "") {
     if (isset($_REQUEST[$key])) {
         return $_REQUEST[$key];
@@ -20,9 +19,7 @@ function getSettingValue($module_id, $key, $default = "") {
     return Option::get($module_id, $key, $default);
 }
 
-// Обработка сохранения настроек
 if (($_REQUEST['Update'] || $_REQUEST['Apply']) && check_bitrix_sessid()) {
-    // Сохраняем настройки
     Option::set($module_id, "user_group_id", $_REQUEST['user_group_id']);
     Option::set($module_id, "iblock_catalog_section_id", $_REQUEST['iblock_catalog_section_id']);
     Option::set($module_id, "iblock_catalog_id", $_REQUEST['iblock_catalog_id']);
@@ -31,14 +28,12 @@ if (($_REQUEST['Update'] || $_REQUEST['Apply']) && check_bitrix_sessid()) {
     Option::set($module_id, "purchase_requests_parts_field", $_REQUEST['purchase_requests_parts_field']);
 }
 
-// Получаем список инфоблоков
 $iblockList = array();
 $res = CIBlock::GetList(array("SORT" => "ASC"), array("ACTIVE" => "Y"));
 while ($iblock = $res->Fetch()) {
     $iblockList[$iblock["ID"]] = "[{$iblock["ID"]}] {$iblock["NAME"]}";
 }
 
-// Получаем список Highload блоков
 $highloadList = array();
 if (Loader::includeModule('highloadblock')) {
     $hlblocks = Bitrix\Highloadblock\HighloadBlockTable::getList();
@@ -47,18 +42,15 @@ if (Loader::includeModule('highloadblock')) {
     }
 }
 
-// Получаем список групп пользователей
 $userGroupsList = array();
 $groupsRes = CGroup::GetList($by = "c_sort", $order = "asc", array("ACTIVE" => "Y"));
 while ($group = $groupsRes->Fetch()) {
     $userGroupsList[$group["ID"]] = "[{$group["ID"]}] {$group["NAME"]}";
 }
 
-// Получаем выбранные значения ИЗ ЗАПРОСА (а не из настроек)
 $selectedCatalogIblockId = getSettingValue($module_id, "iblock_catalog_id");
 $selectedPurchaseIblockId = getSettingValue($module_id, "iblock_purchase_requests_id");
 
-// Получаем список разделов для выбранного инфоблока каталога
 $catalogSectionsList = array();
 if ($selectedCatalogIblockId && Loader::includeModule('iblock')) {
     $sectionsRes = CIBlockSection::GetList(
@@ -73,12 +65,10 @@ if ($selectedCatalogIblockId && Loader::includeModule('iblock')) {
     }
 }
 
-// Получаем список полей для выбранного инфоблока заявок закупок
 $purchaseIblockFields = array();
 if ($selectedPurchaseIblockId && Loader::includeModule('iblock')) {
     $properties = CIBlockProperty::GetList(array("sort" => "asc"), array("IBLOCK_ID" => $selectedPurchaseIblockId, "ACTIVE" => "Y"));
     while ($prop = $properties->Fetch()) {
-        // Показываем только поля типа "список" и "привязка к элементам"
         if (in_array($prop['PROPERTY_TYPE'], array('L', 'E', 'S'))) {
             $purchaseIblockFields[$prop['CODE']] = "[{$prop['CODE']}] {$prop['NAME']}";
         }
@@ -101,7 +91,7 @@ $tabControl->Begin();
 <form method="POST" action="<?echo $APPLICATION->GetCurPage()?>?mid=<?=htmlspecialcharsbx($module_id)?>&lang=<?=LANGUAGE_ID?>">
     <?=bitrix_sessid_post()?>
     
-    <?php $tabControl->BeginNextTab(); // Общие настройки ?>
+    <?php $tabControl->BeginNextTab();?>
     
     <tr>
         <td width="40%"><?=Loc::getMessage('GARAGE_USER_GROUP_ID')?>:</td>

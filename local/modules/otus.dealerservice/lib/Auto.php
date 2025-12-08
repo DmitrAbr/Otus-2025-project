@@ -11,6 +11,13 @@ use Bitrix\Main\Type\DateTime;
 class Auto
 {
     
+    /**
+     * Returns array of deals related to given auto ID.
+     * 
+     * @param int $autoId ID of auto
+     * 
+     * @return array
+     */
     public static function getDeals(int $autoId): array
     {
         Loader::IncludeModule('crm');
@@ -30,6 +37,15 @@ class Auto
         return $deals->fetchAll();
     }
 
+    /**
+     * Changes status of auto with given ID.
+     * 
+     * @param int $autoId ID of auto
+     * @param string $status New status of auto
+     * @param int $userId ID of user who changed status
+     * 
+     * @return UpdateResult Result of update operation
+     */
     public static function changeAutoStatus(int $autoId, string $status, int $userId): UpdateResult
     {
         return AutoTable::update($autoId, [
@@ -39,6 +55,13 @@ class Auto
         ]);
     }
 
+    /**
+     * Returns auto by number.
+     * 
+     * @param string $number Number of auto
+     * 
+     * @return array|null
+     */
     public static function findAutoByNumber(string $number): ?array
     {
         return AutoTable::getList([
@@ -47,14 +70,16 @@ class Auto
         ])->fetch() ?: null;
     }
 
+    /**
+     * Returns true if auto with given ID is in work.
+     * 
+     * @param int $autoId ID of auto
+     * 
+     * @return bool
+     */
     public static function isAutoWorking(int $autoId): bool
     {
         $auto = AutoTable::getById($autoId)->fetch();
         return $auto['STATUS'] === AutoTable::IN_WORK;
-    }
-    
-    public static function create(array $fields): \Bitrix\Main\ORM\Data\AddResult
-    {
-        return AutoTable::add($fields);
     }
 }

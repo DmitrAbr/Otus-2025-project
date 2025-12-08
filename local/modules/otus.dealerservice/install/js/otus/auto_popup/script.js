@@ -25,7 +25,7 @@
                     self.showAutoPopup();
                 })
                 .catch(function(error) {
-                    self.showError('Ошибка при загрузке данных: ' + error);
+                    self.showError(BX.message("ERROR_LOADED_DATA") + error);
                 });
         },
 
@@ -41,7 +41,7 @@
                 self.autoData = response.data.data;
                 return response.data.data;
             }).catch(function(response) {
-                var errorMessage = 'Ошибка при загрузке данных об автомобиле';
+                var errorMessage = BX.message("ERROR_LOADED_DATA_AUTO");
                 if (response && response.errors) {
                     errorMessage = response.errors.join(', ');
                 } else if (response && response.message) {
@@ -72,7 +72,7 @@
                 };
             }).catch(function(response) {
                 self.loadingDeals = false;
-                var errorMessage = 'Ошибка при загрузке сделок';
+                var errorMessage = BX.message("ERROR_LOADED_DEALS");
                 if (response && response.errors) {
                     errorMessage = response.errors.join(', ');
                 } else if (response && response.message) {
@@ -97,7 +97,7 @@
                 width: 800,
                 overlay: true,
                 closeByEsc: true,
-                titleBar: 'Информация об автомобиле',
+                titleBar: BX.message("POPUP_TITLE_DETAIL_AUTO"),
                 className: 'auto-popup-window',
                 events: {
                     onPopupClose: function() {
@@ -107,7 +107,7 @@
                 },
                 buttons: [
                     new BX.PopupWindowButton({
-                        text: 'Закрыть',
+                        text: BX.message("TITLE_BUTTON_CLOSE"),
                         className: 'ui-btn ui-btn-light',
                         events: {
                             click: function () {
@@ -129,7 +129,7 @@
                     props: {
                         className: 'auto-popup-error'
                     },
-                    text: 'Данные об автомобиле не загружены'
+                    text: BX.message("NOT_LOADED_DATA"),
                 });
             }
             
@@ -187,10 +187,10 @@
                             className: 'auto-popup-column auto-popup-auto-info'
                         },
                         children: [
-                            this.createInfoRow('Год выпуска', data.YEAR || '—'),
-                            this.createInfoRow('Цвет', data.COLOR || '—'),
-                            this.createInfoRow('Пробег', data.MILEAGE ? this.formatMileage(data.MILEAGE) : '—'),
-                            this.createInfoRow('Статус', this.getStatusText(data.STATUS) || '—')
+                            this.createInfoRow(BX.message("LABEL_YEAR"), data.YEAR || '—'),
+                            this.createInfoRow(BX.message("LABEL_COLOR"), data.COLOR || '—'),
+                            this.createInfoRow(BX.message("LABEL_MILEAGE"), data.MILEAGE ? this.formatMileage(data.MILEAGE) : '—'),
+                            this.createInfoRow(BX.message("LABEL_STATUS"), this.getStatusText(data.STATUS) || '—')
                         ]
                     }),
                     
@@ -203,7 +203,7 @@
                                 props: {
                                     className: 'auto-popup-deals-title'
                                 },
-                                text: 'Связанные сделки'
+                                text: BX.message("LABEL_DEALS")
                             }),
                             this.createDealsContent()
                         ]
@@ -218,7 +218,7 @@
                     props: {
                         className: 'auto-popup-no-deals'
                     },
-                    text: 'Сделок не найдено'
+                    text: BX.message("DEALS_NOT_FOUND"),
                 });
             }
             
@@ -249,7 +249,7 @@
                                 attrs: {
                                     href: '/crm/deal/details/' + deal.ID + '/',
                                     target: '_blank',
-                                    title: 'Открыть сделку'
+                                    title: BX.message("HREF_OPEN_DEAL")
                                 },
                                 props: {
                                     className: 'auto-popup-deal-title-link'
@@ -259,7 +259,7 @@
                                         props: {
                                             className: 'auto-popup-deal-title'
                                         },
-                                        text: deal.TITLE || 'Сделка без названия'
+                                        text: deal.TITLE
                                     })
                                 ]
                             }),
@@ -274,9 +274,9 @@
                             className: 'auto-popup-deal-info'
                         },
                         children: [
-                            this.createDealInfoRow('Дата создания', deal.DATE_CREATE ? this.formatDate(deal.DATE_CREATE) : '—'),
-                            this.createDealInfoRow('Сумма', deal.OPPORTUNITY ? this.formatCurrency(deal.OPPORTUNITY, deal.CURRENCY_ID) : '—'),
-                            this.createDealInfoRow('Ответственный', deal.ASSIGNED_BY_ID ? this.createUserLink(deal.ASSIGNED_BY_ID, deal.ASSIGNED_BY_FULL_NAME) : '—')
+                            this.createDealInfoRow(BX.message("DEALS_CREATED"), deal.DATE_CREATE ? this.formatDate(deal.DATE_CREATE) : '—'),
+                            this.createDealInfoRow(BX.message("DEALS_SUM"), deal.OPPORTUNITY ? this.formatCurrency(deal.OPPORTUNITY, deal.CURRENCY_ID) : '—'),
+                            this.createDealInfoRow(BX.message("DEALS_RESPONSIBLE"), deal.ASSIGNED_BY_ID ? this.createUserLink(deal.ASSIGNED_BY_ID, deal.ASSIGNED_BY_FULL_NAME) : '—')
                         ]
                     }),
                     
@@ -334,7 +334,7 @@
                 attrs: {
                     href: '/company/personal/user/' + userId + '/',
                     target: '_blank',
-                    title: 'Профиль пользователя'
+                    title: BX.message("HREF_URL_USER"),
                 },
                 props: {
                     className: 'auto-popup-user-link'
@@ -359,7 +359,7 @@
                         props: {
                             className: 'auto-popup-deal-products-title'
                         },
-                        text: 'Товары:'
+                        text: BX.message("PRODUCTS_LISTS")
                     }),
                     BX.create('ul', {
                         props: {
@@ -375,7 +375,7 @@
                                         props: {
                                             className: 'auto-popup-deal-product-name'
                                         },
-                                        text: product.NAME || 'Без названия'
+                                        text: product.NAME
                                     }),
                                     product.QUANTITY ? BX.create('span', {
                                         props: {
@@ -460,10 +460,10 @@
         
         getStatusText: function(status) {
             var statusMap = {
-                'REJECTED': 'Отклонен',
-                'DONE': 'Выполнен',
-                'IN_WORK': 'В работе',
-                'NEW': 'Новый',
+                'REJECTED': BX.message("STATUS_REJECTED"),
+                'DONE': BX.message("STATUS_DONE"),
+                'IN_WORK': BX.message("STATUS_IN_WORK"),
+                'NEW': BX.message("STATUS_NEW"),
             };
             
             return statusMap[status] || status;
@@ -477,7 +477,7 @@
                     autoHideDelay: 5000
                 });
             } else {
-                alert('Ошибка: ' + message);
+                alert(BX.message("ERROR") + message);
             }
         }
     };

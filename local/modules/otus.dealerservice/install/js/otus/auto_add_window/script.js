@@ -19,10 +19,10 @@
             this.grid = BX.Main.gridManager.getInstanceById(this.gridId);
             
             var title = this.isEditMode 
-                ? 'Редактирование автомобиля ' + (this.autoData.MAKE || '') 
-                : 'Добавление автомобиля для ' + this.client.name;
+                ? BX.message("TITLE_POPUP_EDIT") + (this.autoData.MAKE || '') 
+                : BX.message("TITLE_POPUP_ADD") + this.client.name;
                 
-            var buttonText = this.isEditMode ? 'Сохранить' : 'Добавить';
+            var buttonText = this.isEditMode ? BX.message("TITLE_BTN_SAVE") : BX.message("TITLE_BTN_ADD");
 
             var autoId = this.isEditMode && this.autoData.ID ? this.autoData.ID : 0;
             var popupId = 'add_auto_window_' + autoId;
@@ -56,7 +56,7 @@
                         }
                     }),
                     new BX.PopupWindowButton({
-                        text: 'Закрыть',
+                        text: BX.message("TITLE_BTN_CLOSE"),
                         className: 'ui-btn ui-btn-light',
                         events: {
                             click: function () {
@@ -82,12 +82,12 @@
             });
 
             var fields = [
-                { name: 'MAKE', placeholder: 'Марка', type: 'text', required: true },
-                { name: 'MODEL', placeholder: 'Модель', type: 'text', required: true },
-                { name: 'YEAR', placeholder: 'Год выпуска', type: 'number', required: true },
-                { name: 'NUMBER', placeholder: 'Номер', type: 'text', required: true },
-                { name: 'COLOR', placeholder: 'Цвет', type: 'text', required: false },
-                { name: 'MILEAGE', placeholder: 'Пробег', type: 'number', required: false }
+                { name: 'MAKE', placeholder: BX.message("TITLE_LBL_MAKE"), type: 'text', required: true },
+                { name: 'MODEL', placeholder: BX.message("TITLE_LBL_MODEL"), type: 'text', required: true },
+                { name: 'YEAR', placeholder: BX.message("TITLE_LBL_YEAR"), type: 'number', required: true },
+                { name: 'NUMBER', placeholder: BX.message("TITLE_LBL_NUMBER"), type: 'text', required: true },
+                { name: 'COLOR', placeholder: BX.message("TITLE_LBL_COLOR"), type: 'text', required: false },
+                { name: 'MILEAGE', placeholder: BX.message("TITLE_LBL_MILEAGE"), type: 'number', required: false }
             ];
 
             fields.forEach(function(fieldConfig) {
@@ -213,14 +213,12 @@
 
         submitForm: function() {
             if (!this.validateForm()) {
-                this.showError('Заполните обязательные поля');
+                this.showError(BX.message("VALIDATION_ERROR"));
                 return;
             }
 
             var addButton = this.popup.buttons[0];
             var originalText = addButton.textContent;
-            addButton.textContent = this.isEditMode ? "Сохранение..." : "Добавление...";
-            addButton.disabled = true;
 
             var formData = new FormData(this.form);
             var data = {};
@@ -249,8 +247,8 @@
                         self.popup.close();
                     }
                     var successMessage = self.isEditMode 
-                        ? 'Автомобиль успешно обновлен' 
-                        : 'Автомобиль успешно добавлен';
+                        ? BX.message("AUTO_SUCCESS_EDIT") 
+                        : BX.message("AUTO_SUCCESS_ADD");
                     self.showSuccess(successMessage);
                     
                     if (self.grid) {
@@ -258,8 +256,8 @@
                     }
                 } else {
                     var errorMessage = self.isEditMode 
-                        ? 'Ошибка при обновлении автомобиля' 
-                        : 'Ошибка при добавлении автомобиля';
+                        ? BX.message("ERROR_EDIT_AUTO") 
+                        : BX.message("ERROR_ADD_AUTO");
                     
                     if (response.data && response.data.errors && response.data.errors.length > 0) {
                         errorMessage = response.data.errors.join(', ');
@@ -273,7 +271,7 @@
                 addButton.textContent = originalText;
                 addButton.disabled = false;
 
-                var errorMessage = 'Ошибка сети или сервера';
+                var errorMessage = BX.message("ERROR_SERVER");
                 if (response && response.errors) {
                     errorMessage = response.errors.join(', ');
                 } else if (response && response.message) {
@@ -310,7 +308,7 @@
 
     BX.AddAutoWindow.edit = function(autoId, client, definedClassAir, currentUserId, gridId) {
         BX.UI.Notification.Center.notify({
-            content: 'Загрузка данных автомобиля...',
+            content: BX.message("NOTIFY_LOADED"),
             autoHideDelay: 1000
         });
         
@@ -329,7 +327,7 @@
                     response.data.data
                 )).init();
             } else {
-                var errorMessage = 'Ошибка загрузки данных автомобиля';
+                var errorMessage = BX.message("ERROR_LOADED_DATA");
                 if (response.data && response.data.errors && response.data.errors.length > 0) {
                     errorMessage = response.data.errors.join(', ');
                 }
@@ -341,7 +339,7 @@
             }
         }).catch(function(response) {
             BX.UI.Notification.Center.notify({
-                content: 'Ошибка сети при загрузке данных',
+                content: BX.message("ERROR_LOADED_DATA"),
                 autoHide: true,
                 autoHideDelay: 5000
             });

@@ -467,7 +467,7 @@ class Installer
         
         if (!$sectionId) {
             throw new RuntimeException(
-                "Ошибка создания раздела: " . ($bs->LAST_ERROR ?: 'Неизвестная ошибка')
+                $bs->LAST_ERROR
             );
         }
 
@@ -506,7 +506,7 @@ class Installer
         );
         
         if ($hlblockId <= 0) {
-            throw new RuntimeException("Failed to create HLBlock");
+            throw new RuntimeException(Loc::getMessage("FAILED_CREATE_HLBLOCK"));
         }
         
         $properties = [
@@ -624,10 +624,6 @@ class Installer
             }
         }
         
-        if (!$ufMakeId) {
-            throw new RuntimeException("Failed to create UF_MAKE field");
-        }
-        
         return [$hlblockId, $ufMakeId];
     }
     
@@ -692,7 +688,7 @@ class Installer
     {
         if(!Loader::includeModule('iblock') || !Loader::includeModule('catalog'))
         {
-            throw new RuntimeException("Module 'iblock' or 'catalog' not installed");
+            throw new RuntimeException(Loc::getMessage("MODULES_NOT_INSTALLED"));
         }
 
         $el = new CIBlockElement;
@@ -707,7 +703,7 @@ class Installer
         
         if (!$elementId) {
             throw new RuntimeException(
-                "Ошибка создания демо-запчасти: " . ($el->LAST_ERROR ?: 'Неизвестная ошибка')
+                $el->LAST_ERROR
             );
         }
 
@@ -720,24 +716,13 @@ class Installer
         ]);
 
         if ($productResult->isSuccess()) {
-            $priceResult = Price::add([
+            Price::add([
                 'PRODUCT_ID' => $elementId,
                 'CATALOG_GROUP_ID' => 1,
                 'PRICE' => 100,
                 'CURRENCY' => 'RUB',
             ]);
             
-            if (!$priceResult->isSuccess()) {
-                $priceErrors = $priceResult->getErrorMessages();
-                throw new RuntimeException(
-                    "Ошибка создания демо-запчасти: " . ($priceErrors ?: 'Неизвестная ошибка')
-                );
-            }
-        } else {
-            $productErrors = $productResult->getErrorMessages();
-            throw new RuntimeException(
-                "Ошибка создания демо-запчасти: " . ($productErrors ?: 'Неизвестная ошибка')
-            );
         }
     }
 }

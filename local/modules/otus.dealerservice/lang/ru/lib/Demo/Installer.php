@@ -16,3 +16,5 @@ $MESS["CRM_FIELD_COLOR"] = "Цвет";
 $MESS["CRM_FIELD_NUMBER"] = "Номер";
 $MESS["NAME_GROUP_GARAGE"] = "Otus: Пользователи имеющие доступ к гаражу клиента";
 $MESS["CRM_FIELD_AUTO"] = "ID Автомобиля";
+$MESS["FAILED_CREATE_HLBLOCK"] = "Ошибка создания HL-блока";
+$MESS["MODULES_NOT_INSTALLED"] = "Модуль iblock или catalog не установлен";

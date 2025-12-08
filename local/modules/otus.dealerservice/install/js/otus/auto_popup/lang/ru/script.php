@@ -1,1 +1,24 @@
 <?php
+$MESS["ERROR_LOADED_DATA"] = "Ошибка при загрузке данных: ";
+$MESS["ERROR_LOADED_DATA_AUTO"] = "Ошибка при загрузке данных об автомобиле";
+$MESS["ERROR_LOADED_DEALS"] = "Ошибка при загрузке сделок";
+$MESS["POPUP_TITLE_DETAIL_AUTO"] = "Информация об автомобиле";
+$MESS["TITLE_BUTTON_CLOSE"] = "Закрыть";
+$MESS["NOT_LOADED_DATA"] = "Данные об автомобиле не загружены";
+$MESS["LABEL_YEAR"] = "Год выпуска";
+$MESS["LABEL_COLOR"] = "Цвет";
+$MESS["LABEL_MILEAGE"] = "Пробег";
+$MESS["LABEL_STATUS"] = "Автомобиль";
+$MESS["LABEL_DEALS"] = "Связанные сделки";
+$MESS["DEALS_NOT_FOUND"] = "Сделок не найдено";
+$MESS["HREF_OPEN_DEAL"] = "Открыть сделку";
+$MESS["DEALS_CREATED"] = "Дата создания";
+$MESS["DEALS_SUM"] = "Сумма";
+$MESS["DEALS_RESPONSIBLE"] = "Ответственный";
+$MESS["HREF_URL_USER"] = "Профиль пользователя";
+$MESS["PRODUCTS_LISTS"] = "Товары:";
+$MESS["STATUS_REJECTED"] = "Отклонен";
+$MESS["STATUS_DONE"] = "Завершен";
+$MESS["STATUS_IN_WORK"] = "В работе";
+$MESS["STATUS_NEW"] = "Новый";
+$MESS["ERROR"] = "Ошибка: ";

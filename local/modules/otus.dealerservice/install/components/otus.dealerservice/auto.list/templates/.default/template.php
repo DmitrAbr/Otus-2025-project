@@ -17,8 +17,8 @@ $onchange->addAction(
     [
         'ACTION' => Actions::CALLBACK,
         'CONFIRM' => true,
-        'CONFIRM_APPLY_BUTTON'  => 'Подтвердить',
-        'CONFIRM_MESSAGE' => 'Вы действительно хотите удалить выбранные автомобили?',
+        'CONFIRM_APPLY_BUTTON'  => Loc::getMessage('CONFIRM_APPLY_BTN'),
+        'CONFIRM_MESSAGE' => Loc::getMessage("MESSAGE_CONFIRM_DELETE"),
         'DATA' => [
             ['JS' => "deleteSelectedCars('{$arResult['gridId']}')"]
         ]
@@ -90,7 +90,7 @@ $APPLICATION->IncludeComponent(
                         [
                             'ID' => 'delete',
                             'TYPE' => 'BUTTON',
-                            'TEXT' => 'Удалить',
+                            'TEXT' => Loc::getMessage("ACTION_PANEL_BTN_DELETE_TITLE"),
                             'CLASS' => 'ui-btn ui-btn-link ui-btn-icon-cancel',
                             'ONCHANGE' => $onchange->toArray(),
                         ],
@@ -110,12 +110,11 @@ $APPLICATION->IncludeComponent(
         if (typeof BX.AutoGrid !== 'undefined' && typeof BX.AutoGrid.deleteSelected === 'function') {
             BX.AutoGrid.deleteSelected(gridId);
         } else {
-            console.error('BX.AutoGrid is not defined');
             var grid = BX.Main.gridManager.getInstanceById(gridId);
             if (grid) {
                 var selectedIds = grid.getRows().getSelectedIds();
                 if (selectedIds.length > 0) {
-                    if (confirm('Вы действительно хотите удалить выбранные автомобили?')) {
+                    if (confirm(BX.getMessage("MESSAGE_CONFIRM_DELETE"))) {
                         BX.ajax.runComponentAction('otus.dealerservice:auto.list', 'deleteAuto', {
                             mode: 'class',
                             data: {
@@ -125,7 +124,7 @@ $APPLICATION->IncludeComponent(
                             if (response.data && response.data.success === true) {
                                 grid.reloadTable();
                                 BX.UI.Notification.Center.notify({
-                                    content: 'Автомобили успешно удалены',
+                                    content: BX.getMessage("AUTOS_SUCCESS_DELETE"),
                                     autoHideDelay: 3000
                                 });
                             }
@@ -156,6 +155,15 @@ $APPLICATION->IncludeComponent(
                     <?=json_encode($clientFields)?>
                 )).init();
             }
+        });
+        BX.message({
+            'CONFIRM_MESSAGE_DELETE': '<?=Loc::getMessage("CONFIRM_MESSAGE_DELETE")?>',
+            'AUTOS_SUCCESS_DELETE': '<?=Loc::getMessage("AUTOS_SUCCESS_DELETE")?>',
+            'AUTO_SUCCESS_DELETE': '<?=Loc::getMessage("AUTO_SUCCESS_DELETE")?>',
+            'SELECT_AUTO_DELETE': '<?=Loc::getMessage("SELECT_AUTO_DELETE")?>',
+            'ERROR_SERVER_DELETE': '<?=Loc::getMessage("ERROR_SERVER_DELETE")?>',
+            'ERROR_DELETE': '<?=Loc::getMessage("ERROR_DELETE")?>',
+            'WAIT_DELETE': '<?=Loc::getMessage("WAIT_DELETE")?>'
         });
     });
 </script>

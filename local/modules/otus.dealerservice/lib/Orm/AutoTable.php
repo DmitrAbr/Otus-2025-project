@@ -113,6 +113,12 @@ class AutoTable extends DataManager
         $connection->dropTable(self::getTableName());
     }
 
+    /**
+     * Обработчик события после обновления записи в таблице AutoTable.
+     * Меняет сделки, соответствующие записи в таблице DealTable.
+     * @param Event $event
+     * @return EventResult
+     */
     public static function onAfterUpdate(Event $event)
     {
         Loader::IncludeModule('crm');

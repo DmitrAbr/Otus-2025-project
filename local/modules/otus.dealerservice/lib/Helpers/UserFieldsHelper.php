@@ -7,6 +7,12 @@ use CUserFieldEnum;
 
 class UserFieldsHelper
 {
+    /**
+     * Adds a user field to the database.
+     *
+     * @param array $property an array containing the properties of the user field to be added.
+     * @return int the ID of the added user field.
+     */
 	public static function addProperty(array $property): int
     {
         $CUserTypeEntity = new CUserTypeEntity();
@@ -34,6 +40,12 @@ class UserFieldsHelper
         return 0;
     }
     
+    
+    /**
+     * Deletes user fields from the database.
+     *
+     * @param array $propertiesName an array of field names to be deleted.
+     */
     public static function deleteProperty(array $propertiesName): void
     {
 		foreach($propertiesName as $propertyName)

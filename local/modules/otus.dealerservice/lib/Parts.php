@@ -12,6 +12,15 @@ use Bitrix\Main\Diag\Debug;
 class Parts
 {
     public const DEFAULT_COUNT = 10;
+
+    /**
+     * Returns an array of parts from the catalog.
+     *
+     * This function retrieves a list of parts from the catalog and returns them as an array.
+     *
+     * @return array
+     */
+
     public static function getListParts(): array
     {
         Loader::includeModule('catalog');
@@ -23,6 +32,13 @@ class Parts
         return $parts->fetchAll();
     }
 
+    /**
+     * Retrieves the count of parts from the warehouse API.
+     *
+     * @return int The count of parts from the warehouse API.
+     *
+     * @throws \RuntimeException If there is an error making the request to the warehouse API.
+     */
     public static function getCountPartFromWarehouse(): int
     {
         $CurlOptions = [
@@ -49,6 +65,16 @@ class Parts
         return (int)$data;
     }
 
+    
+    /**
+     * Starts the business process of buying parts.
+     *
+     * This function creates a new element in the Bizproc module and starts the business process of buying parts.
+     *
+     * @param array $data The data to pass to the business process.
+     *
+     * @return void
+     */
     public static function startProcessBuy(array $data)
     {
         Loader::includeModule('bizproc');
@@ -73,6 +99,16 @@ class Parts
         self::startBizprocBuy($ID);
     }
 
+    
+    /**
+     * Starts the business process of buying parts.
+     *
+     * This function starts the business process of buying parts by triggering the Bizproc module.
+     *
+     * @param int $ID The ID of the Bizproc element to start the process for.
+     *
+     * @return void
+     */
     public static function startBizprocBuy(int $ID)
     {
         Loader::includeModule('bizproc');

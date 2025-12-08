@@ -48,12 +48,12 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
 
         if(!Loader::includeModule(self::MODULE_ID) || !Loader::includeModule('crm') || !Loader::includeModule('ui'))
         {
-            $errors->setError(new Error("Не установлены обязательные модули"));
+            $errors->setError(new Error(Loc::getMessage("ERROR_LOADED_MODULES")));
         }
 
         if(!$USER->IsAdmin() && Actions::checkRightsUser($USER->GetID()) === false)
         {
-            $errors->setError(new Error('Доступ запрещен, обратитесь к менеджеру'));
+            $errors->setError(new Error(Loc::getMessage("DENIED_ACCESS")));
         }
         
         try {
@@ -194,7 +194,7 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
             });
 
             if (empty($ids)) {
-                $response['errors'][] = 'Не указаны автомобили для удаления';
+                $response['errors'][] = Loc::getMessage('NOT_SELECTED_AUTO_FOR_DELETE');
                 return $response;
             }
 
@@ -233,7 +233,7 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                 $response['success'] = true;
                 $response['data'] = $auto;
             } else {
-                $response['errors'][] = 'Автомобиль не найден';
+                $response['errors'][] = Loc::getMessage("AUTO_NOT_FOUND");
             }
 
         } catch (\Exception $e) {
@@ -261,7 +261,7 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                     $currentUserId = (int)$USER->GetID();
                 }else
                 {
-                    $response['errors'][] = 'Неавторизованный доступ';
+                    $response['errors'][] = Loc::getMessage("UNAUTHORIZED_ACCESS");
                     return $response;
                 }
             }
@@ -306,7 +306,7 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
 
         try {
             if (empty($params['ID'])) {
-                $response['errors'][] = 'Не указан ID автомобиля';
+                $response['errors'][] = Loc::getMessage("ID_AUTO_NOT_FOUND");
                 return $response;
             }
 
@@ -360,7 +360,7 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
         return [
             [
                 'id' => 'TITLE',
-                'name' => 'Автомобиль',
+                'name' => Loc::getMessage("TITLE_AUTO"),
                 'sort' => 'MAKE',
                 'default' => true,
                 'editable' => false
@@ -373,67 +373,67 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
             ],    
             [
                 'id' => 'MAKE',
-                'name' => 'Марка автомобиля',
+                'name' => Loc::getMessage("TITLE_MAKE"),
                 'sort' => 'MAKE',
                 'default' => true
             ],
             [
                 'id' => 'MODEL',
-                'name' => 'Модель',
+                'name' => Loc::getMessage("TITLE_MODEL"),
                 'sort' => 'MODEL',
                 'default' => true
             ],
             [
                 'id' => 'NUMBER',
-                'name' => 'Номер',
+                'name' => Loc::getMessage("TITLE_NUMBER"),
                 'sort' => 'NUMBER',
                 'default' => true
             ],
             [
                 'id' => 'YEAR',
-                'name' => 'Год выпуска',
+                'name' => Loc::getMessage("TITLE_YEAR"),
                 'sort' => 'YEAR',
                 'default' => true
             ],
             [
                 'id' => 'COLOR',
-                'name' => 'Цвет автомобиля',
+                'name' => Loc::getMessage("TITLE_COLOR"),
                 'sort' => 'COLOR',
                 'default' => true
             ],
             [
                 'id' => 'MILEAGE',
-                'name' => 'Пробег',
+                'name' => Loc::getMessage("TITLE_MILEAGE"),
                 'sort' => 'MILEAGE',
                 'default' => true
             ],
             [
                 'id' => 'STATUS',
-                'name' => 'Статус',
+                'name' => Loc::getMessage("TITLE_STATUS"),
                 'sort' => 'STATUS',
                 'default' => true
             ],
             [
                 'id' => 'CREATED_AT',
-                'name' => 'Когда создан',
+                'name' => Loc::getMessage("TITLE_CREATED"),
                 'sort' => 'CREATED_AT',
                 'default' => false
             ],
             [
                 'id' => 'CREATOR_NAME',
-                'name' => 'Кем создан',
+                'name' => Loc::getMessage("TITLE_CREATED_BY"),
                 'sort' => 'CREATED_BY_USER.NAME',
                 'default' => true
             ],
             [
                 'id' => 'UPDATED_AT',
-                'name' => 'Когда обновлен',
+                'name' => Loc::getMessage("TITLE_UPDATED"),
                 'sort' => 'UPDATED_AT',
                 'default' => true
             ],
             [
                 'id' => 'UPDATER_NAME',
-                'name' => 'Кем обновлен',
+                'name' => Loc::getMessage("TITLE_UPDATED_BY"),
                 'sort' => 'UPDATED_BY_USER.NAME',
                 'default' => false
             ],
@@ -532,21 +532,21 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                 'data' => $preparedItem,
                 'actions' => [
                     [
-                        'text' => 'Просмотр',
+                        'text' => Loc::getMessage("TITLE_ACTIONS_VIEW"),
                         'default' => true,
                         'onclick' => '(new BX.AutoPopup('.$item["ID"].', '.json_encode([
                             'name' => $this->arResult['CLIENT_NAME'],
                             'id' => $this->arParams['contactID']]).')).init()'
                     ],
                     [
-                        'text' => 'Редактировать',
+                        'text' => Loc::getMessage("TITLE_ACTIONS_EDIT"),
                         'onclick' => "BX.AddAutoWindow.edit(" . $item['ID'] . ", " . json_encode([
                             'name' => $this->arResult['CLIENT_NAME'],
                             'id' => $this->arParams['contactID']
                         ]) . ", '" . (defined('AIR_SITE_TEMPLATE') ? '--air' : '') . "', " . $this->arResult['CURRENT_USER_ID'] . ", '" . $this->arResult['gridId'] . "')"
                     ],
                     [
-                        'text' => 'Удалить',
+                        'text' => Loc::getMessage("TITLE_ACTIONS_DELETE"),
                         'onclick' => "BX.AutoGrid.deleteOne(" . $item['ID'] . ", '" . $this->arResult['gridId'] . "')"
                     ]
                 ]
@@ -633,25 +633,25 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
     {
         return [
             ['id' => 'ID', 'name' => 'ID', 'type' => 'number', 'default' => true],
-            ['id' => 'MAKE', 'name' => 'Марка автомобиля', 'type' => 'text', 'default' => true],
-            ['id' => 'MODEL', 'name' => 'Модель', 'type' => 'text', 'default' => true],
-            ['id' => 'NUMBER', 'name' => 'Номер', 'type' => 'text', 'default' => true],
-            ['id' => 'YEAR', 'name' => 'Год выпуска', 'type' => 'number', 'default' => true],
-            ['id' => 'COLOR', 'name' => 'Цвет', 'type' => 'text', 'default' => true],
-            ['id' => 'MILEAGE', 'name' => 'Пробег', 'type' => 'number', 'default' => true],
+            ['id' => 'MAKE', 'name' => Loc::getMessage("TITLE_MAKE"), 'type' => 'text', 'default' => true],
+            ['id' => 'MODEL', 'name' => Loc::getMessage("TITLE_MODEL"), 'type' => 'text', 'default' => true],
+            ['id' => 'NUMBER', 'name' => Loc::getMessage("TITLE_NUMBER"), 'type' => 'text', 'default' => true],
+            ['id' => 'YEAR', 'name' => Loc::getMessage("TITLE_YEAR"), 'type' => 'number', 'default' => true],
+            ['id' => 'COLOR', 'name' => Loc::getMessage("TITLE_COLOR"), 'type' => 'text', 'default' => true],
+            ['id' => 'MILEAGE', 'name' => Loc::getMessage("TITLE_MILEAGE"), 'type' => 'number', 'default' => true],
             [
                 'id' => 'STATUS', 
-                'name' => 'Статус', 
+                'name' => Loc::getMessage("TITLE_STATUS"), 
                 'type' => 'list', 
                 'default' => true,
                 'items' => [
-                    AutoTable::NEW => 'Новый',
-                    AutoTable::REJECTED => 'Отклонен',
-                    AutoTable::IN_WORK => 'В работе',
-                    AutoTable::DONE => 'Завершен'
+                    AutoTable::NEW => Loc::getMessage("STATUS_NEW"),
+                    AutoTable::REJECTED => Loc::getMessage("STATUS_REJECTED"),
+                    AutoTable::IN_WORK => Loc::getMessage("STATUS_IN_WORK"),
+                    AutoTable::DONE => Loc::getMessage("STATUS_DONE"),
                 ]
             ],
-            ['id' => 'CREATED_AT', 'name' => 'Дата создания', 'type' => 'date', 'default' => true],
+            ['id' => 'CREATED_AT', 'name' => Loc::getMessage("TITLE_CREATED"), 'type' => 'date', 'default' => true],
         ];
     }
     

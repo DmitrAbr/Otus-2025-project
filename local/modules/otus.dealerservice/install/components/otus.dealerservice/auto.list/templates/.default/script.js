@@ -23,7 +23,7 @@
             }
 
             BX.UI.Notification.Center.notify({
-                content: 'Удаление...',
+                content: BX.message("WAIT_DELETE"),
                 autoHideDelay: 1000
             });
 
@@ -35,8 +35,8 @@
             }).then(function(response) {
                 if (response.data && response.data.success === true) {
                     var successMessage = ids.length === 1 
-                        ? 'Автомобиль успешно удален' 
-                        : 'Автомобили успешно удалены';
+                        ? BX.message("AUTO_SUCCESS_DELETE") 
+                        : BX.message("AUTOS_SUCCESS_DELETE");
                     
                     BX.UI.Notification.Center.notify({
                         content: successMessage,
@@ -49,7 +49,7 @@
                         }
                     }
                 } else {
-                    var errorMessage = 'Ошибка при удалении';
+                    var errorMessage = BX.message("ERROR_DELETE");
                     if (response.data && response.data.errors && response.data.errors.length > 0) {
                         errorMessage = response.data.errors.join(', ');
                     }
@@ -61,7 +61,7 @@
                 }
             }).catch(function(response) {
                 BX.UI.Notification.Center.notify({
-                    content: 'Ошибка сети при удалении',
+                    content: BX.message("ERROR_SERVER_DELETE"),
                     autoHide: true,
                     autoHideDelay: 5000
                 });
@@ -81,7 +81,7 @@
             var selectedIds = grid.getRows().getSelectedIds();
             if (selectedIds.length === 0) {
                 BX.UI.Notification.Center.notify({
-                    content: 'Выберите автомобили для удаления',
+                    content: BX.message("SELECT_AUTO_DELETE"),
                     autoHide: true,
                     autoHideDelay: 3000
                 });
@@ -97,7 +97,7 @@
          * @param {string} gridId - ID грида
          */
         deleteOne: function(id, gridId) {
-            if (confirm('Точно удалить автомобиль?')) {
+            if (confirm(BX.message("CONFIRM_MESSAGE_DELETE"))) {
                 this.delete(id, gridId);
             }
         }

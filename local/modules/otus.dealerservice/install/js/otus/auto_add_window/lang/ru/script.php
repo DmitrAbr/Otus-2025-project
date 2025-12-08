@@ -1,0 +1,20 @@
+<?php
+$MESS["TITLE_POPUP_EDIT"] = "Редактирование автомобиля ";
+$MESS["TITLE_POPUP_ADD"] = "Добавление автомобиля для ";
+$MESS["TITLE_BTN_SAVE"] = "Сохранить";
+$MESS["TITLE_BTN_ADD"] = "Добавить";
+$MESS["TITLE_BTN_CLOSE"] = "Закрыть";
+$MESS["TITLE_LBL_MAKE"] = "Марка";
+$MESS["TITLE_LBL_MODEL"] = "Модель";
+$MESS["TITLE_LBL_YEAR"] = "Год";
+$MESS["TITLE_LBL_COLOR"] = "Цвет";
+$MESS["TITLE_LBL_MILEAGE"] = "Пробег";
+$MESS["TITLE_LBL_NUMBER"] = "Номер";
+$MESS["VALIDATION_ERROR"] = "Заполните обязательные поля";
+$MESS["AUTO_SUCCESS_EDIT"] = "Автомобиль успешно обновлен";
+$MESS["AUTO_SUCCESS_ADD"] = "Автомобиль успешно добавлен";
+$MESS["ERROR_EDIT_AUTO"] = "Ошибка при обновлении автомобиля";
+$MESS["ERROR_ADD_AUTO"] = "Ошибка при добавлении автомобиля";
+$MESS["ERROR_SERVER"] = "Ошибка сервера";
+$MESS["NOTIFY_LOADED"] = "Загрузка данных автомобиля...";
+$MESS["ERROR_LOADED_DATA"] = "Ошибка загрузки данных автомобиля";

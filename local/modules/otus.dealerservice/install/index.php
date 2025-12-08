@@ -29,7 +29,6 @@ class otus_dealerservice extends CModule
     {
         $arModuleVersion = array();
 
-        // Подключение файла версии, который содержит массив для модуля
         include __DIR__ . "/version.php";
         
         $this->MODULE_VERSION = $arModuleVersion["VERSION"];
@@ -40,7 +39,6 @@ class otus_dealerservice extends CModule
         $this->PARTNER_NAME = Loc::getMessage("OTUS_PARTNER_NAME");
         $this->PARTNER_URI = Loc::getMessage("OTUS_PARTNER_URI");
 
-        // Если указано, то на странице редактирования групп будет отображаться этот модуль
         $this->MODULE_GROUP_RIGHTS = "Y";
     }
     
@@ -106,10 +104,6 @@ class otus_dealerservice extends CModule
     		if(!Application::getConnection($entity::getConnectionName())->isTableExists($entity::getTableName()))
     		{
     			Base::getInstance($entity)->createDbTable();
-                if(method_exists($entity, 'demoDataUpload'))
-                {
-                    $entity::demoDataUpload();
-                }
     		}
     	}
     }

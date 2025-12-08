@@ -1,6 +1,26 @@
 <?php
 $MESS["STATUS_NEW"] = "Новый";
-$MESS["STATUS_ACTIVE"] = "Активный";
 $MESS["STATUS_REJECTED"] = "Отклонён";
 $MESS["STATUS_IN_WORK"] = "В работе";
 $MESS["STATUS_DONE"] = "Завершён";
+$MESS["ERROR_LOADED_MODULES"] = "Не установлены обязательные модули";
+$MESS["DENIED_ACCESS"] = "Доступ запрещен, обратитесь к менеджеру";
+$MESS["NOT_SELECTED_AUTO_FOR_DELETE"] = "Не указаны автомобили для удаления";
+$MESS["AUTO_NOT_FOUND"] = "Автомобиль не найден";
+$MESS["UNAUTHORIZED_ACCESS"] = "Неавторизованный доступ";
+$MESS["ID_AUTO_NOT_FOUND"] = "Не указан ID автомобиля";
+$MESS["TITLE_AUTO"] = "Автомобиль";
+$MESS["TITLE_MAKE"] = "Марка автомобиля";
+$MESS["TITLE_MODEL"] = 'Модель';
+$MESS["TITLE_NUMBER"] = "Номер";
+$MESS["TITLE_YEAR"] = "Год выпуска";
+$MESS["TITLE_COLOR"] = "Цвет автомобиля";
+$MESS["TITLE_MILEAGE"] = "Пробег";
+$MESS["TITLE_CREATED_BY"] = "Кем создан";
+$MESS["TITLE_UPDATED_BY"] = "Кем обновлен";
+$MESS["TITLE_CREATED"] = "Дата создания";
+$MESS["TITLE_UPDATED"] = "Дата обновления";
+$MESS["TITLE_STATUS"] = "Статус";
+$MESS["TITLE_ACTIONS_DELETE"] = "Удалить";
+$MESS["TITLE_ACTIONS_EDIT"] = "Редактировать";
+$MESS["TITLE_ACTIONS_VIEW"] = "Просмотр";

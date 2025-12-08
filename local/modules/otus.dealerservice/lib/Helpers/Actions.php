@@ -6,6 +6,11 @@ use Bitrix\Main\Config\Option;
 
 class Actions
 {
+    /**
+     * Checks if user has rights to use module.
+     * @param int $userId User ID
+     * @return bool True if user has rights, false otherwise
+     */
     public static function checkRightsUser($userId)
     {
         $groups = \CUser::GetUserGroup($userId);
