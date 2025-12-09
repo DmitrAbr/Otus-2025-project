@@ -20,7 +20,7 @@
             
             var title = this.isEditMode 
                 ? BX.message("TITLE_POPUP_EDIT") + (this.autoData.MAKE || '') 
-                : BX.message("TITLE_POPUP_ADD") + this.client.name;
+                : BX.message("TITLE_POPUP_ADD") + ' ' + this.client.name;
                 
             var buttonText = this.isEditMode ? BX.message("TITLE_BTN_SAVE") : BX.message("TITLE_BTN_ADD");
 

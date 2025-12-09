@@ -58,6 +58,9 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
         
         try {
             $this->arResult["CURRENT_USER_ID"] = $USER->GetID();
+            
+            $this->getClientInfo($this->arParams['contactID']);
+            
             $this->getOptions();
             $this->fillGridInfo();
             $this->fillGridData();
@@ -77,6 +80,43 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
         }
     }
     
+    private function getClientInfo(int $contactId): void
+    {
+        Loader::includeModule('crm');
+        
+        $contact = \CCrmContact::GetByID($contactId, false);
+        
+        if ($contact) {
+            $this->arResult['CLIENT_NAME'] = \CUser::FormatName(
+                \CSite::GetNameFormat(),
+                [
+                    'NAME' => $contact['NAME'] ?? '',
+                    'LAST_NAME' => $contact['LAST_NAME'] ?? '',
+                    'SECOND_NAME' => $contact['SECOND_NAME'] ?? ''
+                ]
+            );
+            
+            $this->arResult['CLIENT_DATA'] = [
+                'ID' => $contact['ID'],
+                'NAME' => $contact['NAME'] ?? '',
+                'LAST_NAME' => $contact['LAST_NAME'] ?? '',
+                'SECOND_NAME' => $contact['SECOND_NAME'] ?? '',
+                'FULL_NAME' => $this->arResult['CLIENT_NAME'],
+                'PHOTO' => $contact['PHOTO'] ?? null,
+                'EMAIL' => $contact['EMAIL'] ?? '',
+                'PHONE' => $contact['PHONE'] ?? '',
+            ];
+        } else {
+            $this->arResult['CLIENT_NAME'] = 'Контакт #' . $contactId;
+            $this->arResult['CLIENT_DATA'] = [
+                'ID' => $contactId,
+                'FULL_NAME' => $this->arResult['CLIENT_NAME']
+            ];
+        }
+        
+        $this->arParams['clientName'] = $this->arResult['CLIENT_NAME'];
+    }
+
     public function configureActions(): array
     {
         return [
@@ -495,9 +535,6 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                 'CREATOR_ID' => 'CREATED_BY.ID',
                 'UPDATER_ID' => 'UPDATED_BY.ID',
                 'CREATOR_LOGIN' => 'CREATED_BY.LOGIN',
-                'CLIENT_NAME' => 'CONTACT.NAME',
-                'CLIENT_LAST_NAME' => 'CONTACT.LAST_NAME',
-                'CLIENT_SECOND_NAME' => 'CONTACT.SECOND_NAME',
                 'CREATOR_NAME' => 'CREATED_BY.NAME',
                 'CREATOR_LAST_NAME' => 'CREATED_BY.LAST_NAME',
                 'CREATOR_SECOND_NAME' => 'CREATED_BY.SECOND_NAME',
@@ -512,22 +549,9 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
             'count_total' => true
         ]);
         
-        $this->arResult['CLIENT_NAME'] = '';
-
         while ($item = $dataAuto->fetch()) {
             $preparedItem = $this->prepareItemData($item);
             
-            if(empty($this->arResult['CLIENT_NAME']))
-            {
-                $this->arResult['CLIENT_NAME'] = \CUser::FormatName(
-                    \CSite::GetNameFormat(),
-                    ['NAME' => $item['CLIENT_NAME'],
-                            'LAST_NAME' => $item['CLIENT_LAST_NAME'],
-                            'SECOND_NAME' => $item['CLIENT_SECOND_NAME']
-                        ],
-                );
-            }
-
             $list[] = [
                 'data' => $preparedItem,
                 'actions' => [
@@ -535,13 +559,13 @@ class AutoListViewComponent extends \CBitrixComponent implements Controllerable
                         'text' => Loc::getMessage("TITLE_ACTIONS_VIEW"),
                         'default' => true,
                         'onclick' => '(new BX.AutoPopup('.$item["ID"].', '.json_encode([
-                            'name' => $this->arResult['CLIENT_NAME'],
+                            'name' => $this->arResult['CLIENT_NAME'], 
                             'id' => $this->arParams['contactID']]).')).init()'
                     ],
                     [
                         'text' => Loc::getMessage("TITLE_ACTIONS_EDIT"),
                         'onclick' => "BX.AddAutoWindow.edit(" . $item['ID'] . ", " . json_encode([
-                            'name' => $this->arResult['CLIENT_NAME'],
+                            'name' => $this->arResult['CLIENT_NAME'], 
                             'id' => $this->arParams['contactID']
                         ]) . ", '" . (defined('AIR_SITE_TEMPLATE') ? '--air' : '') . "', " . $this->arResult['CURRENT_USER_ID'] . ", '" . $this->arResult['gridId'] . "')"
                     ],

@@ -33,7 +33,7 @@ class CrmAddHandler
 
             $arFields["UF_CRM_AUTO_ID"] = $auto['ID'];
         } else {
-            $result = Auto::create([
+            $result = AutoTable::add([
                 "CLIENT_ID" => $arFields["CONTACT_ID"],
                 "MAKE" => $arFields["UF_CRM_MAKE"],
                 "MODEL" => $arFields["UF_CRM_MODEL"],
