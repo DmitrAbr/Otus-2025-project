@@ -15,27 +15,33 @@ BX.ready(function () {
         let item = BX.create("div", {
             attrs: {
                 className: "main-buttons-item",
-                id: "socialnetwork_profile_menu_user_" + editor._entityId + "_learning",
+                id: "socialnetwork_profile_menu_user_" + editor._entityId + "_processes",
                 draggable: true,
                 tabindex: -1,
             },
             dataset: {
                 disabled: false,
-                id: "learning",
+                id: "processes",
                 topMenuId: topMenuId,
             },
         });
 
-        item.innerHTML = '<span class="main-buttons-item-link">' +
-            '<span class="main-buttons-item-text-title">' +
-            '<span class="main-buttons-item-text-box">Обучение</span>' +
-            '</span>' +
-            '</span>';
+        item.innerHTML = '<span class="main-buttons-item-link"><span class="main-buttons-item-text"><span class="main-buttons-item-text-title"><span class="main-buttons-item-text-box">'+ BX.message("TITLE_BUTTON_PROCESSES") +'</span></span></span></span>'
 
         item.onclick = function (event) {
-            BX.SidePanel.Instance.open("/learning/" + editor._entityId + "/", {
+            BX.SidePanel.Instance.open("/processes/" + editor._entityId + "/", {
                 cacheable: false,
             });
+        }
+
+        item.onmouseout = item.onmouseover = handler;
+
+        function handler(event) {
+            if (event.type == "mouseover") {
+                this.classList.add("--over");
+            } else {
+                this.classList.remove("--over");
+            }
         }
 
         BX.insertAfter(item, topMenuNode.firstElementChild);

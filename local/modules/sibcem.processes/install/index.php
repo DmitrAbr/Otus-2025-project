@@ -6,6 +6,7 @@ use Bitrix\Main\ModuleManager;
 use Bitrix\Main\Application;
 use Bitrix\Main\IO\Directory;
 use Bitrix\Main\IO\InvalidPathException;
+use Bitrix\Main\UrlRewriter;
 
 Loc::loadMessages(__FILE__);
 
@@ -56,6 +57,8 @@ class sibcem_processes extends CModule
         $to_component_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/components';
 		$js_path = $this->getPath(). '/install/js';
         $to_js_path = $_SERVER["DOCUMENT_ROOT"].'/bitrix/js';
+        $public_path = $this->getPath(). '/install/public';
+        $to_public_path = $_SERVER["DOCUMENT_ROOT"].'/';
 
         if(Directory::isDirectoryExists($js_path))
         {
@@ -74,6 +77,25 @@ class sibcem_processes extends CModule
 		{
 			throw new InvalidPathException($component_path);
 		}    
+
+        if(Directory::isDirectoryExists($public_path))
+        {
+            CopyDirFiles($public_path, $to_public_path, true, true);
+        }
+        else
+        {
+            throw new InvalidPathException($public_path);
+        }
+
+        $urlCondition = [
+            'CONDITION' => '#^/processes/#',
+            'RULE' => '',
+            'ID' => 'sibcem:processes.lists',
+            'PATH' => '/processes/index.php',
+            'SORT' => 100
+        ];
+
+        UrlRewriter::add(\SITE_ID, $urlCondition);
     }
 
     function installEvents()
@@ -114,6 +136,7 @@ class sibcem_processes extends CModule
     {
         $component_path = $this->getPath(). '/install/components';
 		$js_path = $this->getPath(). '/install/js';
+        $public_path = $this->getPath(). '/install/public';
 
         if(Directory::isDirectoryExists($js_path))
 		{
@@ -153,6 +176,26 @@ class sibcem_processes extends CModule
 		else
 		{
 			throw new InvalidPathException($component_path);
+		}
+
+        if(Directory::isDirectoryExists($public_path))
+		{
+			$installed_public = new \DirectoryIterator($public_path);
+			foreach($installed_public as $public)
+			{
+				if($public->isDir() && !$public->isDot())
+				{
+					$target_path = $_SERVER["DOCUMENT_ROOT"].'/'.$public->getFilename();
+					if(Directory::isDirectoryExists($target_path))
+					{
+						Directory::deleteDirectory($target_path);
+					}
+				}
+			}
+		}
+		else
+		{
+			throw new InvalidPathException($public_path);
 		}
     }      
 
