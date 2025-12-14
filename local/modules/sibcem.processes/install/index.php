@@ -7,6 +7,9 @@ use Bitrix\Main\Application;
 use Bitrix\Main\IO\Directory;
 use Bitrix\Main\IO\InvalidPathException;
 use Bitrix\Main\UrlRewriter;
+use Bitrix\Main\Loader;
+use Bitrix\Main\Config\Option;
+use Sibcem\Processes\Demo\Installer;
 
 Loc::loadMessages(__FILE__);
 
@@ -41,6 +44,7 @@ class sibcem_processes extends CModule
             ModuleManager::registerModule($this->MODULE_ID);
             $this->installFiles();
             $this->installEvents();
+            $this->installDemo();
         }
     }
 
@@ -48,7 +52,30 @@ class sibcem_processes extends CModule
     {
         $this->uninstallEvents();
         $this->uninstallFiles();
+        $this->uninstallDemo();
+        $this->uninstallOptions();
         ModuleManager::unRegisterModule($this->MODULE_ID);
+    }
+
+    function uninstallOptions()
+    {
+        Option::delete($this->MODULE_ID);
+    }
+
+    function installDemo()
+    {
+        Loader::includeModule($this->MODULE_ID);
+
+        $installer = new Installer();
+        $installer->install();
+    }
+
+    function uninstallDemo()
+    {
+        Loader::IncludeModule($this->MODULE_ID);
+
+        $installer = new Installer();
+        $installer->uninstall();
     }
 
     function installFiles()
@@ -201,7 +228,8 @@ class sibcem_processes extends CModule
 
     function getHandlers()
     {
-        return [
+        return 
+        [
             [
                 'fromModuleId' => 'main',
                 'eventType' => 'OnEpilog',
