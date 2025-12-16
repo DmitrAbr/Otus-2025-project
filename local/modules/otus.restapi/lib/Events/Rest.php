@@ -16,12 +16,30 @@ class Rest
         return [
             'otus.restapi' => [
                 'otus.restapi.add' => [__CLASS__, 'add'],
-            ],
+                'otus.restapi.get' => [__CLASS__, 'get'],
+                'otus.restapi.delete' => [__CLASS__, 'delete'],
+                'otus.restapi.update' => [__CLASS__, 'update'],
+            ]
         ];
     }
 
     public static function add($arParams, $navStartm, \CRestServer $server)
     {
         return DoctorTable::addRestData($arParams, $navStartm, $server);
+    }
+
+    public static function get($arParams, $navStartm, \CRestServer $server)
+    {
+        return DoctorTable::getRestData($arParams, $navStartm, $server);
+    }
+
+    public static function delete($arParams, $navStartm, \CRestServer $server)
+    {
+        return DoctorTable::deleteRestData($arParams, $navStartm, $server);
+    }
+
+    public static function update($arParams, $navStartm, \CRestServer $server)
+    {
+        return DoctorTable::updateRestData($arParams, $navStartm, $server);
     }
 }
